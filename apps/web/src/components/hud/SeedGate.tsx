@@ -55,11 +55,13 @@ export function SeedGate({
               : "API…"}
         </span>
       </div>
+      <p className="floor-kicker">Experimentverdieping</p>
       <h1 id="gate-title" className="gate-title">
-        Seed a world. Descend.
+        Noem een seed. Daal af.
       </h1>
       <p className="gate-lede">
-        Procedural chambers, live dive streams, constellation map. Workflo depth engine.
+        Zelfde schacht, een verdieping lager. De kamers hier zijn een experiment,
+        geen tweede merk.
       </p>
       <form className="gate-form" onSubmit={submit}>
         <label className="sr-only" htmlFor="seed-input">
@@ -76,7 +78,7 @@ export function SeedGate({
           autoComplete="off"
         />
         <button className="btn-primary" type="submit" disabled={busy}>
-          {busy ? "Seeding…" : "Descend"}
+          {busy ? "Seeding…" : "Daal af"}
         </button>
       </form>
       <ul className="chip-row">

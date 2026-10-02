@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Health } from "@depth-showcase/api";
 import { LiveRegion } from "@/components/a11y/LiveRegion";
@@ -92,7 +91,7 @@ export function AtelierApp() {
   }, [session, focusInExits]);
 
   const palette =
-    session.manifest?.palette ?? ["#0a0a0a", "#f2f400", "#6b6b6b", "#f7f7f5", "#dada00"];
+    session.manifest?.palette ?? ["#0c1218", "#c9845a", "#93a4ae", "#e7eef2", "#1a242e"];
   const live =
     session.status === "diving"
       ? "Diving into the next chamber"
@@ -114,7 +113,7 @@ export function AtelierApp() {
     return (
       <>
         <SkipLink href="#seed-input" label="Skip to seed" />
-        <main className="shell threshold">
+        <main className="shell threshold floor-experiment">
           {/* CSS void only — no WebGL on idle gate */}
           <div className="depth-field depth-field--fallback" aria-hidden="true" />
           <div className="overlay threshold-layout" id="main">
@@ -131,9 +130,6 @@ export function AtelierApp() {
               />
             </div>
             <div className="threshold-main">
-              <p className="atelier-back">
-                <Link href="/brief">← Terug naar ochtendbrief</Link>
-              </p>
               <SeedGate
                 busy={session.status === "seeding"}
                 error={session.error}
@@ -151,7 +147,7 @@ export function AtelierApp() {
   return (
     <>
       <SkipLink href="#chamber-controls" label="Skip to chamber controls" />
-      <main className={`shell ${session.status === "diving" ? "is-diving" : ""}`}>
+      <main className={`shell floor-experiment ${session.status === "diving" ? "is-diving" : ""}`}>
         <DepthField
           chamber={session.chamber}
           palette={palette}
