@@ -1,6 +1,7 @@
 import type {
   Chamber,
   Constellation,
+  DemoOfferte,
   DiveEvent,
   DiveRequest,
   Health,
@@ -111,3 +112,9 @@ export async function diveStream(
   }
   finish();
 }
+
+/** Fiction-only sales craft quote for /sales card. */
+export async function fetchDemoOfferte(): Promise<DemoOfferte> {
+  return json(await fetch("/api/demo/offerte"));
+}
+

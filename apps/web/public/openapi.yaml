@@ -118,6 +118,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorBody"
+  /api/demo/offerte:
+    get:
+      summary: Fiction-only Halo-flavored demo quote (sales craft)
+      operationId: getDemoOfferte
+      responses:
+        "200":
+          description: DemoOfferte
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoOfferte"
   /api/constellation:
     get:
       summary: BFS graph of chambers from a seed
@@ -333,3 +344,70 @@ components:
           type: string
         hint:
           type: string
+
+    DemoOfferteLine:
+      type: object
+      required: [id, name, quantity, unitPriceExcl, billingPeriod, billingLabel]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        quantity: { type: number }
+        unitPriceExcl: { type: number }
+        billingPeriod: { type: integer, enum: [0, 2, 3] }
+        billingLabel: { type: string }
+        haloItemId: { type: number }
+        note: { type: string }
+    DemoOfferte:
+      type: object
+      required: [demo, disclaimer, quoteId, status, title, client, contact, currency, lines, totals, craft, createdAt]
+      properties:
+        demo: { type: boolean, enum: [true] }
+        disclaimer: { type: string }
+        quoteId: { type: integer }
+        status:
+          type: object
+          required: [id, label]
+          properties:
+            id: { type: integer, enum: [1] }
+            label: { type: string, enum: [Nieuw] }
+        title: { type: string }
+        client:
+          type: object
+          required: [name, tradingName, city, fictional]
+          properties:
+            name: { type: string }
+            tradingName: { type: string }
+            city: { type: string }
+            fictional: { type: boolean, enum: [true] }
+        contact:
+          type: object
+          required: [name, email, fictional]
+          properties:
+            name: { type: string }
+            email: { type: string }
+            fictional: { type: boolean, enum: [true] }
+        currency: { type: string, enum: [EUR] }
+        lines:
+          type: array
+          items: { $ref: "#/components/schemas/DemoOfferteLine" }
+        totals:
+          type: object
+          required: [oneOffExcl, monthlyExcl, yearlyExcl, vatRate]
+          properties:
+            oneOffExcl: { type: number }
+            monthlyExcl: { type: number }
+            yearlyExcl: { type: number }
+            vatRate: { type: number }
+        craft:
+          type: object
+          required: [tagline, whisper, palette, haloFlavors]
+          properties:
+            tagline: { type: string }
+            whisper: { type: string }
+            palette:
+              type: array
+              items: { type: string }
+            haloFlavors:
+              type: array
+              items: { type: string }
+        createdAt: { type: string, format: date-time }

@@ -17,6 +17,8 @@ export {
   ConstellationSchema,
   HealthSchema,
   ErrorBodySchema,
+  DemoOfferteLineSchema,
+  DemoOfferteSchema,
   type SeedRequest,
   type SeedManifest,
   type PhenomenonKind,
@@ -30,4 +32,6 @@ export {
   type Constellation,
   type Health,
   type ErrorBody,
+  type DemoOfferteLine,
+  type DemoOfferte,
 } from "./schemas";
