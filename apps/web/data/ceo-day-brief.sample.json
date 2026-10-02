@@ -1,65 +1,112 @@
 {
   "panel": "ceo_day_brief",
   "version": "1.0",
-  "generatedAt": "2026-10-02T07:12:00+02:00",
+  "generatedAt": "2026-10-05T07:15:00+02:00",
   "trigger": "preview",
-  "headline": "Three moves before noon — one needs your call.",
+  "headline": "Podimo standby 09:00–13:00 — depth-showcase demo live; two decisions still need your name on them.",
   "sections": {
     "mustDo": [
       {
-        "id": "md-1",
-        "title": "Confirm Q4 MSP pricing for Prospect Atlas",
-        "why": "Quote Helper draft is ready; client call is 11:00.",
-        "due": "2026-10-02T11:00:00+02:00",
+        "id": "md-podimo",
+        "title": "Podimo standby (09:00–13:00)",
+        "why": "On Outlook Monday. Keep the morning clear for client standby.",
+        "due": "2026-10-05T09:00:00+02:00",
         "owner": "Florian",
-        "ref": "handoffs/2026-10-01-atlas-quote"
+        "ref": "outlook:Podimo - standby"
       },
       {
-        "id": "md-2",
-        "title": "Ship OS Cartographer INDEX refresh",
-        "why": "Two new chambers landed overnight; map is stale for the team.",
-        "owner": "OS Cartographer",
-        "ref": "workbot/INDEX.md"
+        "id": "md-tesla-bots",
+        "title": "Confirm Tesla voice → bots test",
+        "why": "Oct 3 handoff: Hey Grok / steering mic → CEO Helper or Grok with SuperGrok Heavy + new connectors. Confirm result or retry.",
+        "owner": "Florian",
+        "ref": "handoffs/2026-10-03-daily.md"
       },
       {
-        "id": "md-3",
-        "title": "Review Backend API contract for Day Brief feed",
-        "why": "Frontend is blocked on the chamber payload shape.",
-        "owner": "Backend Developer",
-        "ref": "workflo-os/api/ceo-day-brief"
+        "id": "md-depth-demo",
+        "title": "Sign off depth-showcase handoff demo",
+        "why": "Handoff card samples on main; GET /api/showcase/handoff live on depth-showcase.vercel.app — quick look if demo-ready.",
+        "owner": "Florian",
+        "ref": "https://depth-showcase.vercel.app"
+      },
+      {
+        "id": "md-depth-landing",
+        "title": "Day Brief chamber as landing",
+        "why": "Frontend pivoting landing to this panel; Backend can serve the payload shape.",
+        "owner": "Frontend Developer",
+        "ref": "02-projects/depth-showcase"
       }
     ],
     "stuck": [
       {
-        "id": "st-1",
+        "id": "st-tesla-webhook",
         "title": "Tesla → Day Brief webhook",
-        "blocker": "Car-entry event not wired to webhook yet.",
+        "blocker": "Routine ceo-day-brief-on-car-entry enabled, never fired — car-entry event not wired.",
         "waitingOn": "Jurre / Tesla integration",
         "since": "2026-10-02T20:30:00+02:00",
         "ref": "routine:ceo-day-brief-on-car-entry"
       },
       {
-        "id": "st-2",
-        "title": "ADR: agent handoff ownership",
-        "blocker": "Decision only lived in chat — no drafted ADR.",
-        "waitingOn": "Decision Clerk",
-        "since": "2026-09-28T09:00:00+02:00",
-        "ref": "decisions/pending/handoff-ownership"
+        "id": "st-aanvragen-halo",
+        "title": "workflo-aanvragen ↔ HaloPSA",
+        "blocker": "First real Halo API call not done; Supabase + n8n still unhooked.",
+        "waitingOn": "Backend / product",
+        "since": "2026-10-01T00:00:00+02:00",
+        "ref": "02-projects/workflo-aanvragen"
+      },
+      {
+        "id": "st-workit-halo-html",
+        "title": "work-it Halo HTML local-edits",
+        "blocker": "Canonical clone decided; Halo HTML local-edits still open and apart.",
+        "waitingOn": "work-it / Florian",
+        "since": "2026-10-02T00:00:00+02:00",
+        "ref": "02-projects/work-it"
+      },
+      {
+        "id": "st-workcert-navigo",
+        "title": "workcert Navigo convention-drift",
+        "blocker": "Repo still uses next/font instead of Navigo — INDEX flag.",
+        "waitingOn": "Frontend / product",
+        "since": "2026-10-02T00:00:00+02:00",
+        "ref": "02-projects/workcert"
       }
     ],
     "stepIn": [
       {
-        "id": "si-1",
-        "title": "Approve CEO Copilot chamber in OS stack",
-        "decision": "Greenlight sample Day Brief panel for depth-showcase?",
-        "context": "Schema + sample payload ready for Backend to serve and Frontend to render. No live car-entry fires until Tesla wiring lands.",
+        "id": "si-fe-be-conventions",
+        "title": "FE/BE conventions ADR",
+        "decision": "Approve contract-first API + brand kit conventions?",
+        "context": "Draft shown Friday; Florian skipped; not on disk yet.",
         "urgency": "today",
-        "ref": "depth-showcase/ceo-copilot"
+        "ref": "decisions:FE/BE-conventies"
+      },
+      {
+        "id": "si-leveringsmodel",
+        "title": "Leveringsmodel remote/onsite naming",
+        "decision": "Akkoord op de naamgeving voor het herziene leveringsmodel?",
+        "context": "On main, but status still “wacht op akkoord naamgeving”.",
+        "urgency": "today",
+        "ref": "decisions:leveringsmodel"
+      },
+      {
+        "id": "si-onboarding-handoff",
+        "title": "Write 2026-10-02 agent-onboarding handoff",
+        "decision": "Confirm or edit the draft still only in Handoff Runner chat — not on disk.",
+        "context": "Session handoff for agent onboarding never landed in 05-knowledge/handoffs/.",
+        "urgency": "this_week",
+        "ref": "handoffs:2026-10-02-agent-onboarding"
+      },
+      {
+        "id": "si-commit-oct3",
+        "title": "Commit Oct 3 daily handoff",
+        "decision": "After the Tesla drive test: commit local 05-knowledge/handoffs/2026-10-03-daily.md?",
+        "context": "File exists locally, still untracked.",
+        "urgency": "this_week",
+        "ref": "handoffs/2026-10-03-daily.md"
       }
     ]
   },
   "meta": {
-    "sources": ["calendar", "handoffs", "index_flags", "decisions"],
+    "sources": ["calendar", "handoffs", "index_flags", "decisions", "mail_urgency"],
     "empty": false
   }
 }

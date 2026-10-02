@@ -306,3 +306,110 @@ export type HandoffPanel = z.infer<typeof HandoffPanelSchema>;
 /** Alias: docs/handoffs/card.sample.json body */
 export const HandoffCardSchema = HandoffCardBodySchema;
 export type HandoffCard = HandoffCardBody;
+
+/* ─── Demo Offerte (cents contract — FE sales panel) ─── */
+
+export const DemoOfferteLineSchema = z.object({
+  sku: z.string(),
+  description: z.string(),
+  qty: z.number().positive(),
+  unitPriceCents: z.number().int().nonnegative(),
+});
+export type DemoOfferteLine = z.infer<typeof DemoOfferteLineSchema>;
+
+/** Bare offerte body matching apps/web/.../demo-offerte.json */
+export const DemoOfferteSchema = z.object({
+  id: z.string(),
+  clientName: z.string(),
+  clientCompany: z.string(),
+  title: z.string(),
+  currency: z.literal("EUR"),
+  lines: z.array(DemoOfferteLineSchema).min(1),
+  subtotalCents: z.number().int().nonnegative(),
+  vatRateBps: z.number().int().nonnegative(),
+  totalCents: z.number().int().nonnegative(),
+  validUntil: z.string(),
+  haloTicketRef: z.string().optional(),
+  toneNote: z.string().optional(),
+});
+export type DemoOfferte = z.infer<typeof DemoOfferteSchema>;
+
+export const DemoOffertePanelSchema = z.object({
+  panel: z.literal("demo_offerte"),
+  version: z.string(),
+  generatedAt: z.string(),
+  offerte: DemoOfferteSchema,
+  meta: z
+    .object({
+      fiction: z.boolean().optional(),
+      source: z.string().optional(),
+    })
+    .optional(),
+});
+export type DemoOffertePanel = z.infer<typeof DemoOffertePanelSchema>;
+
+/* ─── OS Snapshot (morning cockpit) ─── */
+
+export const OsProjectStatusSchema = z.enum([
+  "active",
+  "wip",
+  "on_hold",
+  "archived",
+  "unknown",
+]);
+export type OsProjectStatus = z.infer<typeof OsProjectStatusSchema>;
+
+export const OsProjectSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  status: OsProjectStatusSchema,
+  stack: z.string().optional(),
+  attention: z.string().optional(),
+  repo: z.string().optional(),
+  kind: z.enum(["internal", "external", "infra"]).optional(),
+});
+export type OsProject = z.infer<typeof OsProjectSchema>;
+
+export const OsInfraItemSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  note: z.string().optional(),
+});
+export type OsInfraItem = z.infer<typeof OsInfraItemSchema>;
+
+export const OsSnapshotSchema = z.object({
+  panel: z.literal("os_snapshot"),
+  version: z.string(),
+  generatedAt: z.string(),
+  headline: z.string().optional(),
+  projects: z.array(OsProjectSchema).max(20),
+  infra: z.array(OsInfraItemSchema).optional(),
+  meta: z
+    .object({
+      source: z.literal("static_sample"),
+      empty: z.boolean(),
+    })
+    .optional(),
+});
+export type OsSnapshot = z.infer<typeof OsSnapshotSchema>;
+
+/* ─── CEO Morning aggregate ─── */
+
+export const CockpitMorningHealthSchema = z.object({
+  ok: z.boolean(),
+  version: z.string(),
+  storeMode: StoreModeSchema,
+});
+export type CockpitMorningHealth = z.infer<typeof CockpitMorningHealthSchema>;
+
+export const CockpitMorningSchema = z.object({
+  panel: z.literal("ceo_morning"),
+  version: z.string(),
+  generatedAt: z.string(),
+  dayBrief: CeoDayBriefSchema,
+  handoff: HandoffPanelSchema.nullable(),
+  offerte: DemoOffertePanelSchema,
+  osSnapshot: OsSnapshotSchema,
+  health: CockpitMorningHealthSchema,
+});
+export type CockpitMorning = z.infer<typeof CockpitMorningSchema>;

@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Depth Engine API
-  version: 0.2.0
+  version: 0.3.0
   description: |
     Generative infinite-descent API for the Workflo depth-showcase.
     Contract source of truth: packages/api (Zod). This file mirrors HTTP shapes.
@@ -186,6 +186,43 @@ paths:
         "200":
           description: HandoffPanel
 
+  /api/showcase/offerte:
+    get:
+      summary: Demo offerte panel (cents contract, fiction)
+      operationId: getShowcaseOfferte
+      responses:
+        "200":
+          description: DemoOffertePanel
+        "429":
+          description: Rate limited
+  /api/demo/offerte:
+    get:
+      summary: Alias of /api/showcase/offerte
+      operationId: getDemoOfferte
+      responses:
+        "200":
+          description: DemoOffertePanel
+  /api/os-snapshot:
+    get:
+      summary: Static Workflo OS project snapshot for morning cockpit
+      operationId: getOsSnapshot
+      responses:
+        "200":
+          description: OsSnapshot
+  /api/cockpit/morning:
+    get:
+      summary: CEO morning aggregate (day brief + handoff + offerte + OS snapshot + health)
+      operationId: getCockpitMorning
+      parameters:
+        - name: trigger
+          in: query
+          schema:
+            type: string
+            enum: [tesla_car_entry, manual, preview]
+      responses:
+        "200":
+          description: CockpitMorning
+
 components:
   schemas:
     Health:
@@ -200,7 +237,7 @@ components:
           enum: [depth-engine]
         version:
           type: string
-          example: "0.2.0"
+          example: "0.3.0"
         storeMode:
           type: string
           enum: [memory, file]
@@ -389,3 +426,96 @@ components:
           type: string
         hint:
           type: string
+
+    DemoOfferte:
+      type: object
+      required: [id, clientName, clientCompany, title, currency, lines, subtotalCents, vatRateBps, totalCents, validUntil]
+      properties:
+        id: { type: string }
+        clientName: { type: string }
+        clientCompany: { type: string }
+        title: { type: string }
+        currency: { type: string, enum: [EUR] }
+        lines:
+          type: array
+          items:
+            type: object
+            required: [sku, description, qty, unitPriceCents]
+            properties:
+              sku: { type: string }
+              description: { type: string }
+              qty: { type: number }
+              unitPriceCents: { type: integer }
+        subtotalCents: { type: integer }
+        vatRateBps: { type: integer }
+        totalCents: { type: integer }
+        validUntil: { type: string }
+        haloTicketRef: { type: string }
+        toneNote: { type: string }
+    DemoOffertePanel:
+      type: object
+      required: [panel, version, generatedAt, offerte]
+      properties:
+        panel: { type: string, enum: [demo_offerte] }
+        version: { type: string }
+        generatedAt: { type: string, format: date-time }
+        offerte: { $ref: "#/components/schemas/DemoOfferte" }
+        meta:
+          type: object
+          properties:
+            fiction: { type: boolean }
+            source: { type: string }
+    OsSnapshot:
+      type: object
+      required: [panel, version, generatedAt, projects]
+      properties:
+        panel: { type: string, enum: [os_snapshot] }
+        version: { type: string }
+        generatedAt: { type: string, format: date-time }
+        headline: { type: string }
+        projects:
+          type: array
+          maxItems: 20
+          items:
+            type: object
+            required: [id, name, status]
+            properties:
+              id: { type: string }
+              name: { type: string }
+              status: { type: string, enum: [active, wip, on_hold, archived, unknown] }
+              stack: { type: string }
+              attention: { type: string }
+              repo: { type: string }
+              kind: { type: string, enum: [internal, external, infra] }
+        infra:
+          type: array
+          items:
+            type: object
+            required: [id, name]
+            properties:
+              id: { type: string }
+              name: { type: string }
+              note: { type: string }
+        meta:
+          type: object
+          properties:
+            source: { type: string, enum: [static_sample] }
+            empty: { type: boolean }
+    CockpitMorning:
+      type: object
+      required: [panel, version, generatedAt, dayBrief, handoff, offerte, osSnapshot, health]
+      properties:
+        panel: { type: string, enum: [ceo_morning] }
+        version: { type: string }
+        generatedAt: { type: string, format: date-time }
+        dayBrief: { type: object }
+        handoff: { type: object, nullable: true }
+        offerte: { $ref: "#/components/schemas/DemoOffertePanel" }
+        osSnapshot: { $ref: "#/components/schemas/OsSnapshot" }
+        health:
+          type: object
+          required: [ok, version, storeMode]
+          properties:
+            ok: { type: boolean }
+            version: { type: string }
+            storeMode: { type: string, enum: [memory, file] }

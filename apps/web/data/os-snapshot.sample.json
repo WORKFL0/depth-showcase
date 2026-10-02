@@ -1,0 +1,128 @@
+{
+  "panel": "os_snapshot",
+  "version": "1.0",
+  "generatedAt": "2026-10-02T22:00:00+02:00",
+  "headline": "Workflo OS — living INDEX snapshot (static sample).",
+  "projects": [
+    {
+      "id": "work-it",
+      "name": "work-it",
+      "status": "active",
+      "stack": "Next.js 14 monorepo (Turborepo)",
+      "attention": "Canonical clone WORKFL0/work-it; Halo HTML local-edits apart.",
+      "repo": "WORKFL0/work-it",
+      "kind": "internal"
+    },
+    {
+      "id": "depth-showcase",
+      "name": "depth-showcase",
+      "status": "wip",
+      "stack": "pnpm · Next.js 15 + @depth-showcase/api",
+      "attention": "CEO cockpit + Depth Engine showcase.",
+      "repo": "WORKFL0/depth-showcase",
+      "kind": "internal"
+    },
+    {
+      "id": "workcert",
+      "name": "workcert",
+      "status": "wip",
+      "stack": "Next.js + Supabase",
+      "attention": "next/font vs Navigo convention-drift.",
+      "repo": "WORKFL0/workcert",
+      "kind": "internal"
+    },
+    {
+      "id": "workflo-domains",
+      "name": "workflo-domains",
+      "status": "wip",
+      "stack": "@work-it/ui",
+      "attention": "4 live, 17 wip.",
+      "repo": "WORKFL0/workflo-domains",
+      "kind": "internal"
+    },
+    {
+      "id": "workflo-aanvragen",
+      "name": "workflo-aanvragen",
+      "status": "wip",
+      "stack": "Next.js 14 + Tailwind",
+      "attention": "Halo/Supabase/n8n still uncoupled.",
+      "repo": "WORKFL0/workflo-aanvragen",
+      "kind": "internal"
+    },
+    {
+      "id": "workflo-network",
+      "name": "workflo-network",
+      "status": "wip",
+      "stack": "Next.js",
+      "attention": "Multi-tenant *-work.it + niche funnels.",
+      "repo": "WORKFL0/workflo-network",
+      "kind": "internal"
+    },
+    {
+      "id": "workflo-landing",
+      "name": "workflo-landing",
+      "status": "on_hold",
+      "stack": "Next.js",
+      "attention": "Dormant marketing redesign; live site is work-it.",
+      "repo": "WORKFL0/workflo-landing",
+      "kind": "internal"
+    },
+    {
+      "id": "workflow-finance",
+      "name": "workflow-finance",
+      "status": "on_hold",
+      "stack": "scaffold",
+      "attention": "Local-only license-reconciler scaffold.",
+      "kind": "internal"
+    },
+    {
+      "id": "kopzorgen-haarverzorging",
+      "name": "kopzorgen-haarverzorging",
+      "status": "wip",
+      "stack": "Next.js + Sanity + Supabase",
+      "attention": "External client (kapsalon Leiden).",
+      "repo": "WORKFL0/kopzorgen-haarverzorging",
+      "kind": "external"
+    },
+    {
+      "id": "cinco-travel",
+      "name": "cinco-travel",
+      "status": "wip",
+      "stack": "Next.js + next-intl",
+      "attention": "External client (Cinco Travel).",
+      "repo": "WORKFL0/cinco-travel",
+      "kind": "external"
+    },
+    {
+      "id": "workflo-cockpit",
+      "name": "workflo-cockpit",
+      "status": "unknown",
+      "stack": "Next.js",
+      "attention": "Legacy cockpit surface; depth-showcase is the new morning home.",
+      "kind": "internal"
+    },
+    {
+      "id": "ninjaone-antigravity",
+      "name": "NinjaOne-Antigravity",
+      "status": "on_hold",
+      "stack": "Brew/MDM scripts",
+      "attention": "Intern RMM tooling.",
+      "repo": "WORKFL0/NinjaOne-Antigravity",
+      "kind": "internal"
+    },
+    {
+      "id": "old-projects",
+      "name": "Old projects",
+      "status": "archived",
+      "attention": "Consider move to 99-archive/.",
+      "kind": "internal"
+    }
+  ],
+  "infra": [
+    { "id": "supabase", "name": "Supabase", "note": "3 prod DBs — 04-infra/supabase/" },
+    { "id": "n8n", "name": "n8n", "note": "n8n.workflo.it — 04-infra/n8n/" },
+    { "id": "vercel", "name": "Vercel", "note": "team florian-de-haans-projects" },
+    { "id": "dns", "name": "DNS / .it domains", "note": "Cloudflare — 04-infra/dns-domains/" }
+  ],
+  "meta": { "source": "static_sample", "empty": false }
+}

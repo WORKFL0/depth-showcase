@@ -12,7 +12,7 @@ export function GET(req: Request) {
   const body: Health = {
     ok: true,
     service: "depth-engine",
-    version: "0.2.0",
+    version: "0.3.0",
     storeMode: storeMode(),
   };
   return withCors(body, undefined, req);

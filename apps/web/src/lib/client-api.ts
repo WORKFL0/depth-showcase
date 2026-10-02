@@ -1,11 +1,14 @@
 import type {
   CeoDayBrief,
   Chamber,
+  CockpitMorning,
   Constellation,
+  DemoOffertePanel,
   DiveEvent,
   DiveRequest,
   Health,
   HandoffPanel,
+  OsSnapshot,
   SeedManifest,
   Session,
   SessionPatch,
@@ -97,6 +100,21 @@ export async function getCeoDayBrief(
 
 export async function getShowcaseHandoff(): Promise<HandoffPanel> {
   return json(await fetch("/api/showcase/handoff"));
+}
+
+export async function getDemoOfferte(): Promise<DemoOffertePanel> {
+  return json(await fetch("/api/showcase/offerte"));
+}
+
+export async function getOsSnapshot(): Promise<OsSnapshot> {
+  return json(await fetch("/api/os-snapshot"));
+}
+
+export async function getCockpitMorning(
+  trigger?: "preview" | "manual" | "tesla_car_entry",
+): Promise<CockpitMorning> {
+  const q = trigger ? `?trigger=${encodeURIComponent(trigger)}` : "";
+  return json(await fetch(`/api/cockpit/morning${q}`));
 }
 
 export type DiveHandlers = {
