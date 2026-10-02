@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 const SUGGESTIONS = [
@@ -16,11 +15,14 @@ export function SeedGate({
   busy,
   error,
   onEnter,
+  health,
 }: {
   busy: boolean;
   error: string | null;
   onEnter: (seed?: string) => void;
+  health: { ok: boolean | null; version?: string; storeMode?: string } | null;
 }) {
+  const healthOk = health?.ok ?? null;
   const [value, setValue] = useState("");
   const reduced = useReducedMotion();
 
@@ -29,46 +31,36 @@ export function SeedGate({
     onEnter(value.trim() || undefined);
   }
 
-  const enter = reduced
-    ? { opacity: 1, y: 0 }
-    : { opacity: 0, y: 8 };
-  const shown = { opacity: 1, y: 0 };
-
   return (
-    <motion.section
-      className="gate"
+    <section
+      className={`gate ${reduced ? "gate--static" : "gate--enter"}`}
       aria-labelledby="gate-title"
-      initial={enter}
-      animate={shown}
-      transition={{ duration: reduced ? 0 : 0.28, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="gate-glow" aria-hidden="true" />
-      <motion.p
-        className="eyebrow"
-        initial={reduced ? false : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: reduced ? 0 : 0.06, duration: reduced ? 0 : 0.22 }}
-      >
-        DEPTH ATELIER · v0.1
-      </motion.p>
-      <motion.h1
-        id="gate-title"
-        className="gate-title"
-        initial={reduced ? false : { opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: reduced ? 0 : 0.08, duration: reduced ? 0 : 0.24 }}
-      >
-        Descend into a seeded world
-      </motion.h1>
-      <motion.p
-        className="gate-lede"
-        initial={reduced ? false : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: reduced ? 0 : 0.1, duration: reduced ? 0 : 0.22 }}
-      >
-        One seed. Infinite chambers. Procedural laws, SSE dives, and a living
-        constellation — an overnight atelier piece of spatial depth.
-      </motion.p>
+      <div className="gate-brand">
+        <img
+          src="/brand/logos/logo-horizontal-on-dark.png"
+          alt="Workflo"
+          className="gate-logo"
+          width={160}
+          height={36}
+        />
+        <span
+          className={`health-chip ${healthOk === true ? "is-live" : healthOk === false ? "is-down" : "is-wait"}`}
+          aria-live="polite"
+        >
+          {healthOk === true
+            ? `API ${health?.version ?? "live"}${health?.storeMode ? ` · ${health.storeMode}` : ""}`
+            : healthOk === false
+              ? "API down"
+              : "API…"}
+        </span>
+      </div>
+      <h1 id="gate-title" className="gate-title">
+        Seed a world. Descend.
+      </h1>
+      <p className="gate-lede">
+        Procedural chambers, live dive streams, constellation map. Workflo depth engine.
+      </p>
       <form className="gate-form" onSubmit={submit}>
         <label className="sr-only" htmlFor="seed-input">
           World seed
@@ -76,57 +68,39 @@ export function SeedGate({
         <input
           id="seed-input"
           className="gate-input"
-          placeholder="name a world — or leave blank"
+          placeholder="name a seed"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           maxLength={128}
           disabled={busy}
           autoComplete="off"
-          autoFocus
         />
         <button className="btn-primary" type="submit" disabled={busy}>
-          <span className="btn-primary-label">
-            {busy ? "Seeding…" : "Cross the threshold"}
-          </span>
-          {!busy ? <span className="btn-primary-arrow" aria-hidden="true">↓</span> : null}
+          {busy ? "Seeding…" : "Descend"}
         </button>
       </form>
-      <div className="chip-row" role="list">
-        {SUGGESTIONS.map((s, i) => (
-          <motion.button
-            key={s}
-            type="button"
-            className="chip"
-            role="listitem"
-            disabled={busy}
-            onClick={() => onEnter(s)}
-            initial={reduced ? false : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: reduced ? 0 : 0.12 + i * 0.03, duration: reduced ? 0 : 0.2 }}
-            whileHover={reduced ? undefined : { y: -1 }}
-            whileTap={reduced ? undefined : { scale: 0.98 }}
-          >
-            {s}
-          </motion.button>
+      <ul className="chip-row">
+        {SUGGESTIONS.map((s) => (
+          <li key={s}>
+            <button
+              type="button"
+              className="chip"
+              disabled={busy}
+              onClick={() => onEnter(s)}
+            >
+              {s}
+            </button>
+          </li>
         ))}
-      </div>
-      <AnimatePresence>
-        {error ? (
-          <motion.p
-            className="error"
-            role="alert"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-          >
-            {error}
-          </motion.p>
-        ) : null}
-      </AnimatePresence>
+      </ul>
+      {error ? (
+        <p className="error" role="alert">
+          {error}
+        </p>
+      ) : null}
       <p className="gate-hint">
-        Tip: after entry, press <kbd>1</kbd>–<kbd>9</kbd> to dive · <kbd>M</kbd>{" "}
-        constellation
+        After entry: focus exits, then <kbd>1</kbd>–<kbd>9</kbd> to dive · <kbd>M</kbd> map
       </p>
-    </motion.section>
+    </section>
   );
 }

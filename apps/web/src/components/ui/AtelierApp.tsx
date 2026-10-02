@@ -1,19 +1,39 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { AnimatePresence } from "framer-motion";
-import { DepthField } from "@/components/engine/DepthField";
+import dynamic from "next/dynamic";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { CeoDayBrief, HandoffCard as HandoffCardData, Health } from "@depth-showcase/api";
 import { LiveRegion } from "@/components/a11y/LiveRegion";
 import { SkipLink } from "@/components/a11y/SkipLink";
 import { ChamberHud } from "@/components/hud/ChamberHud";
 import { ConstellationMap } from "@/components/hud/ConstellationMap";
 import { SeedGate } from "@/components/hud/SeedGate";
+import { CeoDayBriefPanel } from "@/components/craft/CeoDayBriefPanel";
+import { HandoffCard } from "@/components/craft/HandoffCard";
+import { DemoOfferteCard } from "@/components/sales/DemoOfferteCard";
+import { DEMO_OFFERTE } from "@/components/sales/demo-offerte";
 import { DemoAdCopy } from "@/components/seo/DemoAdCopy";
 import { useDepthSession } from "@/hooks/use-depth-session";
+import {
+  getCeoDayBrief,
+  fetchHealth,
+  getShowcaseHandoff,
+} from "@/lib/client-api";
+import handoffSample from "@/content/handoffs/card.sample.json";
+import ceoSample from "@/content/ceo/day-brief-panel.sample.json";
+
+const DepthField = dynamic(
+  () =>
+    import("@/components/engine/DepthField").then((m) => m.DepthField),
+  { ssr: false, loading: () => <div className="depth-field depth-field--fallback" aria-hidden="true" /> },
+);
 
 export function AtelierApp() {
   const session = useDepthSession();
   const pointer = useRef({ x: 0, y: 0 });
+  const [health, setHealth] = useState<{ ok: boolean | null; version?: string; storeMode?: string } | null>(null);
+  const [handoff, setHandoff] = useState<HandoffCardData | null>(null);
+  const [dayBrief, setDayBrief] = useState<CeoDayBrief | null>(null);
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
@@ -25,17 +45,71 @@ export function AtelierApp() {
   }, []);
 
   useEffect(() => {
+    let alive = true;
+    void (async () => {
+      try {
+        const h: Health = await fetchHealth();
+        if (alive) setHealth({ ok: h.ok === true, version: h.version, storeMode: h.storeMode });
+      } catch {
+        if (alive) setHealth({ ok: false });
+      }
+    })();
+    const id = window.setInterval(() => {
+      void fetchHealth()
+        .then((h) => alive && setHealth({ ok: h.ok === true, version: h.version, storeMode: h.storeMode }))
+        .catch(() => alive && setHealth({ ok: false }));
+    }, 30000);
+    return () => {
+      alive = false;
+      window.clearInterval(id);
+    };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    void (async () => {
+      try {
+        const panel = await getShowcaseHandoff();
+        if (alive && panel?.card) setHandoff(panel.card);
+        else if (alive) setHandoff(handoffSample as HandoffCardData);
+      } catch {
+        if (alive) setHandoff(handoffSample as HandoffCardData);
+      }
+      try {
+        const brief = await getCeoDayBrief();
+        if (alive) setDayBrief(brief);
+      } catch {
+        if (alive) setDayBrief(ceoSample as CeoDayBrief);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const focusInExits = useCallback(() => {
+    const root = document.getElementById("chamber-controls");
+    if (!root) return false;
+    const ae = document.activeElement;
+    return !!ae && (ae === root || root.contains(ae));
+  }, []);
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement
       )
         return;
-      if (e.key === "m" || e.key === "M") {
-        if (session.chamber) session.toggleMap();
-      }
       if (e.key === "Escape" && session.mapOpen) {
         session.toggleMap();
+        return;
+      }
+      // Digits / M only when focus is inside #chamber-controls (a11y F2)
+      if (!focusInExits()) return;
+      if (e.key === "m" || e.key === "M") {
+        if (session.chamber) session.toggleMap();
+        return;
       }
       const n = Number(e.key);
       if (
@@ -50,10 +124,10 @@ export function AtelierApp() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [session]);
+  }, [session, focusInExits]);
 
   const palette =
-    session.manifest?.palette ?? ["#0a0a0a", "#f2a65a", "#f2f400", "#7ec8e3", "#e94560"];
+    session.manifest?.palette ?? ["#0a0a0a", "#f2f400", "#6b6b6b", "#f7f7f5", "#dada00"];
   const live =
     session.status === "diving"
       ? "Diving into the next chamber"
@@ -63,31 +137,45 @@ export function AtelierApp() {
           ? `Arrived at ${session.chamber.title}, depth ${session.chamber.depth}${
               session.chamber.paradox ? ", paradox chamber" : ""
             }`
-          : "Awaiting a seed — cross the threshold to begin";
+          : "Awaiting a seed";
 
-  if (
+  const idle =
     session.status === "idle" ||
     session.status === "seeding" ||
     !session.chamber ||
-    !session.manifest
-  ) {
+    !session.manifest;
+
+  if (idle) {
     return (
       <main className="shell threshold">
         <SkipLink />
-        <DepthField
-          chamber={null}
-          palette={palette}
-          diving={false}
-          pointer={pointer}
-        />
-        <div className="overlay" id="main">
-          <SeedGate
-            busy={session.status === "seeding"}
-            error={session.error}
-            onEnter={(s) => void session.seedWorld(s)}
-          />
+        <DepthField chamber={null} palette={palette} diving={false} pointer={pointer} />
+        <div className="overlay threshold-layout" id="main">
+          <div className="threshold-hero">
+            <img
+              src="/brand/stills/still-01-hero-depth.png"
+              alt=""
+              className="threshold-still"
+              width={720}
+              height={900}
+            />
+          </div>
+          <div className="threshold-main">
+            <SeedGate
+              busy={session.status === "seeding"}
+              error={session.error}
+              health={health}
+              onEnter={(s) => void session.seedWorld(s)}
+            />
+          </div>
+          <aside className="threshold-rail" aria-label="Craft panels">
+            <DemoOfferteCard offerte={DEMO_OFFERTE} />
+            {handoff ? <HandoffCard card={handoff} /> : null}
+            {dayBrief && !dayBrief.meta?.empty ? (
+              <CeoDayBriefPanel brief={dayBrief} />
+            ) : null}
+          </aside>
         </div>
-        {/* Demo SEA: footer rail below threshold fold — not inside SeedGate */}
         <DemoAdCopy />
         <LiveRegion message={live} />
       </main>
@@ -105,24 +193,26 @@ export function AtelierApp() {
       />
       <div className="overlay" id="main">
         <ChamberHud
-          chamber={session.chamber}
-          manifest={session.manifest}
+          chamber={session.chamber!}
+          manifest={session.manifest!}
           diving={session.status === "diving"}
           whispers={session.whispers}
+          health={health}
           onDive={(i) => void session.dive(i)}
           onMap={session.toggleMap}
           onReset={session.reset}
         />
-        <AnimatePresence>
-          {session.mapOpen ? (
+        {session.mapOpen ? (
+          <>
+            <div className="map-backdrop" aria-hidden="true" onClick={session.toggleMap} />
             <ConstellationMap
               key="constellation"
               data={session.constellation}
-              currentId={session.chamber.id}
+              currentId={session.chamber!.id}
               onClose={session.toggleMap}
             />
-          ) : null}
-        </AnimatePresence>
+          </>
+        ) : null}
         {session.error ? (
           <p className="error floating" role="alert">
             {session.error}

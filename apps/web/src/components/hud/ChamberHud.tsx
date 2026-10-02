@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import type { Chamber, SeedManifest } from "@depth-showcase/api";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
@@ -9,6 +8,7 @@ export function ChamberHud({
   manifest,
   diving,
   whispers,
+  health,
   onDive,
   onMap,
   onReset,
@@ -17,28 +17,35 @@ export function ChamberHud({
   manifest: SeedManifest;
   diving: boolean;
   whispers: string[];
+  health: { ok: boolean | null; version?: string; storeMode?: string } | null;
   onDive: (index: number) => void;
   onMap: () => void;
   onReset: () => void;
 }) {
+  const healthOk = health?.ok ?? null;
   const reduced = useReducedMotion();
-  const palette = manifest.palette;
 
   return (
-    <motion.div
-      className="hud"
+    <div
+      className={`hud ${reduced ? "" : "hud--enter"}`}
       aria-live="polite"
       key={chamber.id}
-      initial={reduced ? false : { opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: reduced ? 0 : 0.28, ease: [0.22, 1, 0.36, 1] }}
     >
       <header className="hud-top">
         <div>
-          <p className="eyebrow">
-            DEPTH {String(chamber.depth).padStart(2, "0")}
-            {chamber.paradox ? " · PARADOX" : ""}
-            {diving ? " · DIVING" : ""}
+          <p className="hud-instrument">
+            <span>DEPTH {String(chamber.depth).padStart(2, "0")}</span>
+            {chamber.paradox ? <span className="hud-flag">PARADOX</span> : null}
+            {diving ? <span className="hud-flag">DIVING</span> : null}
+            <span
+              className={`health-chip ${healthOk === true ? "is-live" : healthOk === false ? "is-down" : "is-wait"}`}
+            >
+              {healthOk === true
+                ? `v${health?.version ?? "0.2"}${health?.storeMode ? `/${health.storeMode}` : ""}`
+                : healthOk === false
+                  ? "API↓"
+                  : "…"}
+            </span>
           </p>
           <h2 className="hud-title">{chamber.title}</h2>
           <p className="hud-meta">
@@ -51,9 +58,9 @@ export function ChamberHud({
             </span>{" "}
             {(chamber.resonance * 100).toFixed(0)}%
           </p>
-          {palette.length > 0 ? (
+          {manifest.palette.length > 0 ? (
             <div className="palette-row" aria-label="World palette">
-              {palette.slice(0, 6).map((c, i) => (
+              {manifest.palette.slice(0, 6).map((c, i) => (
                 <span
                   key={`${c}-${i}`}
                   className="palette-swatch"
@@ -66,7 +73,7 @@ export function ChamberHud({
         </div>
         <div className="hud-actions">
           <button type="button" className="btn-ghost" onClick={onMap}>
-            Constellation <kbd className="kbd-inline">M</kbd>
+            Map <kbd className="kbd-inline">M</kbd>
           </button>
           <button type="button" className="btn-ghost" onClick={onReset}>
             New seed
@@ -75,74 +82,44 @@ export function ChamberHud({
       </header>
 
       <ul className="laws" aria-label="World laws">
-        {manifest.laws.slice(0, 4).map((law, i) => (
-          <motion.li
-            key={law}
-            initial={reduced ? false : { opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: reduced ? 0 : 0.04 + i * 0.03, duration: reduced ? 0 : 0.22 }}
-          >
-            {law}
-          </motion.li>
+        {manifest.laws.slice(0, 4).map((law) => (
+          <li key={law}>{law}</li>
         ))}
       </ul>
 
       <div className="phen-row" aria-label="Phenomena">
         {chamber.phenomena.map((ph, i) => (
-          <motion.span
+          <span
             key={`${ph.kind}-${i}`}
             className={`phen-pill phen-${ph.kind}`}
             title={ph.detail}
-            initial={reduced ? false : { opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: reduced ? 0 : 0.06 + i * 0.03, duration: reduced ? 0 : 0.2 }}
           >
             <strong>{ph.kind}</strong> {ph.label}
             <span className="phen-intensity" aria-hidden="true">
               {Math.round(ph.intensity * 100)}%
             </span>
-          </motion.span>
+          </span>
         ))}
       </div>
 
-      <AnimatePresence mode="popLayout">
-        {whispers.length > 0 ? (
-          <motion.div
-            className="whisper-stack"
-            aria-label="Whispers"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            {whispers.slice(-3).map((w, i) => (
-              <motion.p
-                key={`${w}-${i}`}
-                className="whisper"
-                initial={reduced ? false : { opacity: 0, y: 6 }}
-                animate={{ opacity: 0.9 - (2 - i) * 0.15, y: 0 }}
-              >
-                {w}
-              </motion.p>
-            ))}
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      {whispers.length > 0 ? (
+        <div className="whisper-stack" aria-label="Whispers">
+          {whispers.slice(-3).map((w, i) => (
+            <p key={`${w}-${i}`} className="whisper">
+              {w}
+            </p>
+          ))}
+        </div>
+      ) : null}
 
-      <nav className="exits" aria-label="Chamber exits">
+      <nav className="exits" id="chamber-controls" tabIndex={-1} aria-label="Chamber exits">
         {chamber.exits.map((exit, i) => (
-          <motion.button
+          <button
             key={`${exit.label}-${i}`}
             type="button"
             className={`exit-btn ${exit.risk > 0.65 ? "exit-hot" : ""}`}
             disabled={diving}
             onClick={() => onDive(i)}
-            whileHover={
-              reduced || diving ? undefined : { y: -3, x: -1 }
-            }
-            whileTap={reduced || diving ? undefined : { scale: 0.98 }}
-            initial={reduced ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: reduced ? 0 : 0.08 + i * 0.04, duration: reduced ? 0 : 0.22 }}
           >
             <span className="exit-index" aria-hidden="true">
               {i + 1}
@@ -154,15 +131,13 @@ export function ChamberHud({
                 <span
                   className="risk-bar"
                   aria-hidden="true"
-                  style={{
-                    ["--risk" as string]: `${Math.round(exit.risk * 100)}%`,
-                  }}
+                  style={{ ["--risk" as string]: `${Math.round(exit.risk * 100)}%` }}
                 />
               </span>
             </span>
-          </motion.button>
+          </button>
         ))}
       </nav>
-    </motion.div>
+    </div>
   );
 }

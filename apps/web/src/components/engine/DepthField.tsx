@@ -6,7 +6,7 @@
  */
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, Stars, Sparkles } from "@react-three/drei";
+import { Float } from "@react-three/drei";
 import {
   Suspense,
   useMemo,
@@ -467,7 +467,7 @@ function ParadoxCore({
           <mesh ref={b} position={[0, 0, -2.6]}>
             <icosahedronGeometry args={geoArgs} />
             <meshBasicMaterial
-              color="#00f0ff"
+              color="#F2F400"
               wireframe
               transparent
               opacity={0.2}
@@ -478,7 +478,7 @@ function ParadoxCore({
           <mesh ref={c} position={[0, 0, -2.6]}>
             <icosahedronGeometry args={geoArgs} />
             <meshBasicMaterial
-              color="#ff2d55"
+              color="#F7F7F5"
               wireframe
               transparent
               opacity={0.15}
@@ -677,28 +677,6 @@ function ChamberScene({
         distance={18}
       />
 
-      {!reduced && (
-        <Stars
-          radius={48}
-          depth={36}
-          count={1600}
-          factor={2.8}
-          saturation={0}
-          fade
-          speed={diving ? 1.2 : 0.2}
-        />
-      )}
-      {!reduced && (
-        <Sparkles
-          count={48}
-          scale={[10, 6, 10]}
-          size={2.5}
-          speed={0.18}
-          opacity={0.45}
-          color={accent}
-        />
-      )}
-
       <NebulaDust
         color={signal}
         reduced={reduced}
@@ -754,9 +732,6 @@ function EmptyField({
         intensity={1}
         color={tone(palette, 1, "#e8a060")}
       />
-      {!reduced && (
-        <Stars radius={55} depth={42} count={700} factor={2} fade speed={0.12} />
-      )}
       <NebulaDust
         color={tone(palette, 2, "#7ec8c8")}
         reduced={reduced}
@@ -783,7 +758,7 @@ export function DepthField({ chamber, palette, diving, pointer }: Props) {
   return (
     <div className="absolute inset-0 depth-field" aria-hidden="true" role="presentation">
       <Canvas
-        dpr={reduced ? 1 : [1, 1.75]}
+        dpr={reduced ? 1 : (typeof window !== "undefined" && window.innerWidth < 768 ? 1 : [1, 1.5])}
         gl={{
           antialias: !reduced,
           alpha: false,
