@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { AnimatePresence } from "framer-motion";
 import { DepthField } from "@/components/engine/DepthField";
 import { LiveRegion } from "@/components/a11y/LiveRegion";
 import { SkipLink } from "@/components/a11y/SkipLink";
@@ -24,7 +25,10 @@ export function AtelierApp() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      )
         return;
       if (e.key === "m" || e.key === "M") {
         if (session.chamber) session.toggleMap();
@@ -48,13 +52,17 @@ export function AtelierApp() {
   }, [session]);
 
   const palette =
-    session.manifest?.palette ?? ["#F2F400", "#F2F400", "#ffffff"];
+    session.manifest?.palette ?? ["#0a0a0a", "#f2a65a", "#f2f400", "#7ec8e3", "#e94560"];
   const live =
     session.status === "diving"
       ? "Diving into the next chamber"
-      : session.chamber
-        ? `Arrived at ${session.chamber.title}, depth ${session.chamber.depth}`
-        : "Awaiting a seed";
+      : session.status === "seeding"
+        ? "Seeding world"
+        : session.chamber
+          ? `Arrived at ${session.chamber.title}, depth ${session.chamber.depth}${
+              session.chamber.paradox ? ", paradox chamber" : ""
+            }`
+          : "Awaiting a seed — cross the threshold to begin";
 
   if (
     session.status === "idle" ||
@@ -84,7 +92,7 @@ export function AtelierApp() {
   }
 
   return (
-    <main className="shell">
+    <main className={`shell ${session.status === "diving" ? "is-diving" : ""}`}>
       <SkipLink />
       <DepthField
         chamber={session.chamber}
@@ -102,13 +110,16 @@ export function AtelierApp() {
           onMap={session.toggleMap}
           onReset={session.reset}
         />
-        {session.mapOpen ? (
-          <ConstellationMap
-            data={session.constellation}
-            currentId={session.chamber.id}
-            onClose={session.toggleMap}
-          />
-        ) : null}
+        <AnimatePresence>
+          {session.mapOpen ? (
+            <ConstellationMap
+              key="constellation"
+              data={session.constellation}
+              currentId={session.chamber.id}
+              onClose={session.toggleMap}
+            />
+          ) : null}
+        </AnimatePresence>
         {session.error ? (
           <p className="error floating" role="alert">
             {session.error}

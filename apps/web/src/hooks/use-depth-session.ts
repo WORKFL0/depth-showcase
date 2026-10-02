@@ -40,6 +40,11 @@ export function useDepthSession() {
   const [state, setState] = useState<SessionState>(initial);
   const abortRef = useRef<AbortController | null>(null);
   const seedRef = useRef<string | null>(null);
+  // Keep latest chamber/manifest for dive without stale closures
+  const chamberRef = useRef<Chamber | null>(null);
+  const manifestRef = useRef<SeedManifest | null>(null);
+  chamberRef.current = state.chamber;
+  manifestRef.current = state.manifest;
 
   const refreshConstellation = useCallback(async (seed: string) => {
     try {
@@ -63,7 +68,10 @@ export function useDepthSession() {
       try {
         const manifest = await postSeed(seed?.trim() || undefined);
         seedRef.current = manifest.seed;
-        const chamber = await fetchChamber(manifest.rootChamberId, manifest.seed);
+        const chamber = await fetchChamber(
+          manifest.rootChamberId,
+          manifest.seed,
+        );
         setState({
           status: "ready",
           manifest,
@@ -83,12 +91,14 @@ export function useDepthSession() {
         }));
       }
     },
-    [refreshConstellation]
+    [refreshConstellation],
   );
 
   const dive = useCallback(
     async (choiceIndex: number, intensity = 0.55) => {
-      if (!state.chamber || !state.manifest) return;
+      const chamber = chamberRef.current;
+      const manifest = manifestRef.current;
+      if (!chamber || !manifest) return;
       abortRef.current?.abort();
       const ac = new AbortController();
       abortRef.current = ac;
@@ -101,11 +111,11 @@ export function useDepthSession() {
       }));
 
       const collected: DiveEvent[] = [];
-      const seed = state.manifest.seed;
+      const seed = manifest.seed;
       try {
         await diveStream(
           {
-            fromChamberId: state.chamber.id,
+            fromChamberId: chamber.id,
             choiceIndex,
             intensity,
           },
@@ -142,7 +152,7 @@ export function useDepthSession() {
               }));
             },
           },
-          ac.signal
+          ac.signal,
         );
       } catch (e) {
         if ((e as Error).name === "AbortError") return;
@@ -153,7 +163,7 @@ export function useDepthSession() {
         }));
       }
     },
-    [state.chamber, state.manifest, refreshConstellation]
+    [refreshConstellation],
   );
 
   const toggleMap = useCallback(() => {

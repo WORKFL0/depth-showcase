@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 const SUGGESTIONS = [
   "obsidian-tide",
@@ -20,22 +22,53 @@ export function SeedGate({
   onEnter: (seed?: string) => void;
 }) {
   const [value, setValue] = useState("");
+  const reduced = useReducedMotion();
 
   function submit(e: FormEvent) {
     e.preventDefault();
     onEnter(value.trim() || undefined);
   }
 
+  const enter = reduced
+    ? { opacity: 1, y: 0, scale: 1 }
+    : { opacity: 0, y: 28, scale: 0.96 };
+  const shown = { opacity: 1, y: 0, scale: 1 };
+
   return (
-    <section className="gate" aria-labelledby="gate-title">
-      <p className="eyebrow">DEPTH ATELIER · v0.1</p>
-      <h1 id="gate-title" className="gate-title">
+    <motion.section
+      className="gate"
+      aria-labelledby="gate-title"
+      initial={enter}
+      animate={shown}
+      transition={{ duration: reduced ? 0 : 0.85, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <div className="gate-glow" aria-hidden="true" />
+      <motion.p
+        className="eyebrow"
+        initial={reduced ? false : { opacity: 0, letterSpacing: "0.4em" }}
+        animate={{ opacity: 1, letterSpacing: "0.16em" }}
+        transition={{ delay: reduced ? 0 : 0.15, duration: 0.7 }}
+      >
+        DEPTH ATELIER · v0.1
+      </motion.p>
+      <motion.h1
+        id="gate-title"
+        className="gate-title"
+        initial={reduced ? false : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: reduced ? 0 : 0.28, duration: 0.7 }}
+      >
         Descend into a seeded world
-      </h1>
-      <p className="gate-lede">
+      </motion.h1>
+      <motion.p
+        className="gate-lede"
+        initial={reduced ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: reduced ? 0 : 0.42, duration: 0.6 }}
+      >
         One seed. Infinite chambers. Procedural laws, SSE dives, and a living
-        constellation — built overnight to show what Workflo bots can do.
-      </p>
+        constellation — an overnight atelier piece of spatial depth.
+      </motion.p>
       <form className="gate-form" onSubmit={submit}>
         <label className="sr-only" htmlFor="seed-input">
           World seed
@@ -49,30 +82,51 @@ export function SeedGate({
           maxLength={128}
           disabled={busy}
           autoComplete="off"
+          autoFocus
         />
         <button className="btn-primary" type="submit" disabled={busy}>
-          {busy ? "Seeding…" : "Enter"}
+          <span className="btn-primary-label">
+            {busy ? "Seeding…" : "Cross the threshold"}
+          </span>
+          {!busy ? <span className="btn-primary-arrow" aria-hidden="true">↓</span> : null}
         </button>
       </form>
       <div className="chip-row" role="list">
-        {SUGGESTIONS.map((s) => (
-          <button
+        {SUGGESTIONS.map((s, i) => (
+          <motion.button
             key={s}
             type="button"
             className="chip"
             role="listitem"
             disabled={busy}
             onClick={() => onEnter(s)}
+            initial={reduced ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: reduced ? 0 : 0.5 + i * 0.05 }}
+            whileHover={reduced ? undefined : { y: -2 }}
+            whileTap={reduced ? undefined : { scale: 0.97 }}
           >
             {s}
-          </button>
+          </motion.button>
         ))}
       </div>
-      {error ? (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      ) : null}
-    </section>
+      <AnimatePresence>
+        {error ? (
+          <motion.p
+            className="error"
+            role="alert"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+          >
+            {error}
+          </motion.p>
+        ) : null}
+      </AnimatePresence>
+      <p className="gate-hint">
+        Tip: after entry, press <kbd>1</kbd>–<kbd>9</kbd> to dive · <kbd>M</kbd>{" "}
+        constellation
+      </p>
+    </motion.section>
   );
 }

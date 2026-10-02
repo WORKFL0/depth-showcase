@@ -25,13 +25,14 @@ export async function postSeed(seed?: string): Promise<SeedManifest> {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(seed ? { seed } : {}),
-    })
+    }),
   );
 }
 
+/** Chamber ids can be long / hint-embedded — always URL-encode. */
 export async function fetchChamber(
   id: string,
-  seed?: string
+  seed?: string,
 ): Promise<Chamber> {
   const q = seed ? `?seed=${encodeURIComponent(seed)}` : "";
   return json(await fetch(`/api/chamber/${encodeURIComponent(id)}${q}`));
@@ -39,7 +40,7 @@ export async function fetchChamber(
 
 export async function fetchConstellation(seed: string): Promise<Constellation> {
   return json(
-    await fetch(`/api/constellation?seed=${encodeURIComponent(seed)}`)
+    await fetch(`/api/constellation?seed=${encodeURIComponent(seed)}`),
   );
 }
 
@@ -54,12 +55,20 @@ export async function diveStream(
   body: DiveRequest,
   _seed: string | undefined,
   handlers: DiveHandlers,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<void> {
   const res = await fetch(`/api/dive`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
-    body: JSON.stringify(body),
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "text/event-stream",
+    },
+    body: JSON.stringify({
+      ...body,
+      // fromChamberId is in JSON body; still keep ids opaque/encoded when
+      // they ever appear in query/path elsewhere.
+      fromChamberId: body.fromChamberId,
+    }),
     signal,
   });
   if (!res.ok || !res.body) {
@@ -69,6 +78,13 @@ export async function diveStream(
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
+  let finished = false;
+
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    handlers.onDone?.();
+  };
 
   while (true) {
     const { done, value } = await reader.read();
@@ -77,16 +93,14 @@ export async function diveStream(
     const chunks = buffer.split("\n\n");
     buffer = chunks.pop() ?? "";
     for (const chunk of chunks) {
-      const dataLine = chunk
-        .split("\n")
-        .find((l) => l.startsWith("data:"));
+      const dataLine = chunk.split("\n").find((l) => l.startsWith("data:"));
       if (!dataLine) continue;
       const raw = dataLine.slice(5).trim();
       if (!raw) continue;
       try {
         const parsed = JSON.parse(raw) as DiveEvent | { type: "done" };
         if (parsed.type === "done") {
-          handlers.onDone?.();
+          finish();
           continue;
         }
         handlers.onEvent(parsed as DiveEvent);
@@ -95,5 +109,5 @@ export async function diveStream(
       }
     }
   }
-  handlers.onDone?.();
+  finish();
 }
