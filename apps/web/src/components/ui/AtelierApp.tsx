@@ -8,6 +8,7 @@ import { SkipLink } from "@/components/a11y/SkipLink";
 import { ChamberHud } from "@/components/hud/ChamberHud";
 import { ConstellationMap } from "@/components/hud/ConstellationMap";
 import { SeedGate } from "@/components/hud/SeedGate";
+import { DemoAdCopy } from "@/components/seo/DemoAdCopy";
 import { useDepthSession } from "@/hooks/use-depth-session";
 
 export function AtelierApp() {
@@ -86,6 +87,8 @@ export function AtelierApp() {
             onEnter={(s) => void session.seedWorld(s)}
           />
         </div>
+        {/* Demo SEA: footer rail below threshold fold — not inside SeedGate */}
+        <DemoAdCopy />
         <LiveRegion message={live} />
       </main>
     );
