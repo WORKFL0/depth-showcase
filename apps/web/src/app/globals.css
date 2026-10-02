@@ -47,6 +47,7 @@
   --fog: var(--wf-fog, #6b6b6b);
   --ink: var(--wf-black, #0a0a0a);
   --danger: #c62828;
+  --danger-text: #ff4d6d;
   --hard: var(--wf-shadow-hard-yellow, 6px 6px 0 #f2f400);
   --hard-inv: var(--wf-shadow-hard, 6px 6px 0 #0a0a0a);
   --radius: var(--wf-radius-max, 4px);
@@ -287,7 +288,7 @@ a:focus:not(:focus-visible) { outline: none; }
   background: transparent; color: var(--mist); font-size: 0.82rem;
 }
 .chip:hover:not(:disabled) { background: rgba(242, 244, 0, 0.1); }
-.error { margin-top: 1rem; color: var(--danger); }
+.error { margin-top: 1rem; color: var(--danger-text); }
 .error.floating {
   position: fixed; left: 1rem; bottom: 1rem; z-index: 5; margin: 0;
   padding: 0.75rem 1rem; background: var(--void);
@@ -392,7 +393,7 @@ a:focus:not(:focus-visible) { outline: none; }
 }
 .exit-hot .exit-index {
   background: var(--danger);
-  color: var(--ink);
+  color: #fff;
 }
 .exit-body {
   display: flex; flex-direction: column; gap: 0.3rem;
@@ -403,7 +404,7 @@ a:focus:not(:focus-visible) { outline: none; }
   font-size: 0.75rem; color: var(--signal); letter-spacing: 0.04em;
   display: flex; flex-direction: column; gap: 0.25rem;
 }
-.exit-hot .exit-risk { color: var(--danger); }
+.exit-hot .exit-risk { color: var(--danger-text); }
 .risk-bar {
   display: block; height: 3px; width: 100%;
   background: rgba(242, 244, 0, 0.15); position: relative;
@@ -522,7 +523,7 @@ a:focus:not(:focus-visible) { outline: none; }
 .craft-card__section ul { margin: 0; padding-left: 1.1rem; }
 .craft-card__section li { margin: 0.2rem 0; line-height: 1.35; }
 .craft-card__owner, .craft-card__why { color: var(--fog); font-weight: 400; }
-.section-stuck h3 { color: var(--danger); }
+.section-stuck h3 { color: var(--danger-text); }
 
 /* Sales / demo offerte — hard atelier, yellow scarce */
 .sales-shell {

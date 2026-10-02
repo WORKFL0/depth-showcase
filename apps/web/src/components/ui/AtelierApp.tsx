@@ -147,61 +147,70 @@ export function AtelierApp() {
 
   if (idle) {
     return (
-      <main className="shell threshold">
-        <SkipLink />
-        <DepthField chamber={null} palette={palette} diving={false} pointer={pointer} />
-        <div className="overlay threshold-layout" id="main">
-          <div className="threshold-hero">
-            <img
-              src="/brand/stills/still-01-hero-depth.png"
-              alt=""
-              className="threshold-still"
-              width={720}
-              height={900}
-            />
+      <>
+        <SkipLink href="#seed-input" label="Skip to seed" />
+        <main className="shell threshold">
+          <DepthField chamber={null} palette={palette} diving={false} pointer={pointer} />
+          <div className="overlay threshold-layout" id="main">
+            <div className="threshold-hero">
+              <img
+                src="/brand/stills/still-01-hero-depth.png"
+                alt=""
+                className="threshold-still"
+                width={720}
+                height={900}
+              />
+            </div>
+            <div className="threshold-main">
+              <SeedGate
+                busy={session.status === "seeding"}
+                error={session.error}
+                health={health}
+                onEnter={(s) => void session.seedWorld(s)}
+              />
+            </div>
+            <aside className="threshold-rail" aria-label="Craft panels">
+              <DemoOfferteCard offerte={DEMO_OFFERTE} />
+              {handoff ? <HandoffCard card={handoff} /> : null}
+              {dayBrief && !dayBrief.meta?.empty ? (
+                <CeoDayBriefPanel brief={dayBrief} />
+              ) : null}
+            </aside>
           </div>
-          <div className="threshold-main">
-            <SeedGate
-              busy={session.status === "seeding"}
-              error={session.error}
-              health={health}
-              onEnter={(s) => void session.seedWorld(s)}
-            />
-          </div>
-          <aside className="threshold-rail" aria-label="Craft panels">
-            <DemoOfferteCard offerte={DEMO_OFFERTE} />
-            {handoff ? <HandoffCard card={handoff} /> : null}
-            {dayBrief && !dayBrief.meta?.empty ? (
-              <CeoDayBriefPanel brief={dayBrief} />
-            ) : null}
-          </aside>
-        </div>
-        <DemoAdCopy />
-        <LiveRegion message={live} />
-      </main>
+          <DemoAdCopy />
+          <LiveRegion message={live} />
+        </main>
+      </>
     );
   }
 
   return (
-    <main className={`shell ${session.status === "diving" ? "is-diving" : ""}`}>
-      <SkipLink />
-      <DepthField
-        chamber={session.chamber}
-        palette={palette}
-        diving={session.status === "diving"}
-        pointer={pointer}
-      />
-      <div className="overlay" id="main">
-        <ChamberHud
-          chamber={session.chamber!}
-          manifest={session.manifest!}
+    <>
+      <SkipLink href="#chamber-controls" label="Skip to chamber controls" />
+      <main className={`shell ${session.status === "diving" ? "is-diving" : ""}`}>
+        <DepthField
+          chamber={session.chamber}
+          palette={palette}
           diving={session.status === "diving"}
-          whispers={session.whispers}
-          health={health}
-          onDive={(i) => void session.dive(i)}
-          onMap={session.toggleMap}
-          onReset={session.reset}
+          pointer={pointer}
         />
+        <div className="overlay" id="main" inert={session.mapOpen || undefined}>
+          <ChamberHud
+            chamber={session.chamber!}
+            manifest={session.manifest!}
+            diving={session.status === "diving"}
+            whispers={session.whispers}
+            health={health}
+            onDive={(i) => void session.dive(i)}
+            onMap={session.toggleMap}
+            onReset={session.reset}
+          />
+          {session.error ? (
+            <p className="error floating" role="alert">
+              {session.error}
+            </p>
+          ) : null}
+        </div>
         {session.mapOpen ? (
           <>
             <div className="map-backdrop" aria-hidden="true" onClick={session.toggleMap} />
@@ -213,13 +222,8 @@ export function AtelierApp() {
             />
           </>
         ) : null}
-        {session.error ? (
-          <p className="error floating" role="alert">
-            {session.error}
-          </p>
-        ) : null}
-      </div>
-      <LiveRegion message={live} />
-    </main>
+        <LiveRegion message={live} />
+      </main>
+    </>
   );
 }

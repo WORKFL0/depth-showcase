@@ -19,6 +19,8 @@
 | Minor | 2 |
 | **Total** | **10** |
 
+**F1–F5 remediations (2026-10-02 follow-up):** F1 chip list markup; F2 focus-gated shortcuts; F3 dialog focus + `#main` `inert`; F4 split `--danger` / `--danger-text` + white on hot index; F5 SkipLink before `<main>` with gate/chamber targets. Re-QA keyboard when Playwright is free.
+
 **Already in good shape (keep):** `lang="en"`; global `:focus-visible` ring (`--signal` on void); `prefers-reduced-motion` CSS kill-switch + `useReducedMotion` + R3F reduced paths; seed field has visible-adjacent `sr-only` label; WebGL shell `aria-hidden`; exit controls are native `<button>`s; assertive `LiveRegion` for session status; skip-link styles exist.
 
 ## Findings
@@ -27,9 +29,9 @@
 | --- | --- | --- | --- | --- | --- |
 | F1 | 4.1.2 Name, Role, Value | Critical | Gate chips — `SeedGate.tsx`; live `/` | Live HTML: `<button type="button" class="chip" role="listitem">` (×5). Explicit `role="listitem"` **overrides** the button role → AT exposes list items, not buttons. | Remove `role="listitem"` / `role="list"`. Prefer `<ul class="chip-row"><li><button class="chip">…</button></li></ul>` (style `li` reset). |
 | F2 | 2.1.4 Character Key Shortcuts | Critical | Global keys — `AtelierApp.tsx` | Single-character handlers for `m`/`M` and `1`–`9` (when not in an input). No turn-off, remap, or “active only on focus” control. | Require a modifier (e.g. Alt+digit), **or** add a persistent “Disable letter/number shortcuts” control, **or** activate digits only while focus is inside `nav.exits`. Keep Esc for dialog close (non-character). |
-| F3 | 2.4.3 Focus Order (dialog) | Serious | Constellation — `ConstellationMap.tsx` | `role="dialog"` + `aria-modal="true"` with **no** initial focus move, **no** focus trap, **no** focus restore; bottom sheet does not inert the background HUD. | On open: focus Close (or first focusable); trap Tab inside; set `inert` (or `aria-hidden` + tabindex=-1) on `#main` siblings; on close restore prior focus. Esc already wired in `AtelierApp`. |
-| F4 | 1.4.3 Contrast (Minimum) | Serious | Hot exits — `globals.css` `.exit-hot .exit-index` | `#ffffff` on `#ff4d6d` ≈ **3.21:1**. Index is `font-size: 1rem` (not large text → needs 4.5:1). Live API can emit `risk > 0.65` (e.g. seed `risk-hunt-a11y` exit “Take the soft fracture” ≈ 0.696) → `.exit-hot` applies. | Use `color: var(--ink)` on `.exit-hot .exit-index` (ink on danger ≈ 6.2:1), or darken danger fill until white ≥ 4.5:1. |
-| F5 | 2.4.1 Bypass Blocks | Serious | Skip link — `SkipLink.tsx`, `AtelierApp.tsx`, `SeedGate.tsx` | Skip link is **inside** `<main>`; target `#main` is the overlay (gate on entry). Seed input has `autoFocus`, so first focus skips the skip link. | Place `<SkipLink />` as first body child **before** `<main>`; point href to `#chamber-controls` on the exits `<nav>` (render target only when chamber exists). Drop or defer `autoFocus` so Tab reaches skip first. |
+| F3 | 2.4.3 Focus Order (dialog) | Serious | Constellation — `ConstellationMap.tsx` | Dialog lacked initial focus / trap / restore; background HUD was not inert. | **Remediated:** Close gets initial focus; Tab trap + focus restore on close; `#main` (HUD) gets `inert` while map open; Esc closes. |
+| F4 | 1.4.3 Contrast (Minimum) | Serious | Hot exits — `globals.css` `.exit-hot .exit-index` | Originally `#ffffff` on `#ff4d6d` ≈ **3.21:1**; after darkening fill to `#c62828`, ink-on-danger was **3.52:1**. Index is `font-size: 1rem` (not large text → needs 4.5:1). | **Remediated:** `--danger` `#c62828` kept as fill; `--danger-text` `#ff4d6d` for text/icons (≥4.5:1 on void). `.exit-hot .exit-index` uses white on danger fill (**5.62:1**). |
+| F5 | 2.4.1 Bypass Blocks | Serious | Skip link — `SkipLink.tsx`, `AtelierApp.tsx`, `SeedGate.tsx` | Skip link was **inside** `<main>`; gate had no `#chamber-controls` target; seed `autoFocus` stole first focus. | **Remediated:** `<SkipLink />` before `<main>`; gate → `#seed-input` (“Skip to seed”); chamber → `#chamber-controls`. `autoFocus` removed. |
 | F6 | 1.3.1 / 2.4.6 Headings | Moderate | Chamber HUD — `ChamberHud.tsx` | After seed, page has **no `h1`** (gate `h1` unmounted); chamber title is `h2`. | Make chamber title `h1` (or keep a visually hidden `h1` for the atelier). |
 | F7 | 1.3.1 Info and Relationships | Moderate | Phenomena — `ChamberHud.tsx` | `ph.detail` only on `title=`; intensity in `.phen-intensity` is `aria-hidden`. Keyboard/AT users miss detail/intensity. | Surface detail in text or `aria-describedby`; do not hide intensity from the accessible name (or announce via live region on change). |
 | F8 | 4.1.3 Status Messages | Moderate | HUD live — `ChamberHud.tsx` + `LiveRegion.tsx` | Whole `.hud` has `aria-live="polite"` and remounts via `key={chamber.id}`, while assertive `LiveRegion` also announces arrivals → duplicate/noisy status. | Remove `aria-live` from `.hud`; keep a single assertive/polite live region with concise messages. |
@@ -66,10 +68,10 @@ Scope: keyboard, focus, contrast, reduced-motion **critical/serious** items.
 | File | Change |
 | --- | --- |
 | `apps/web/src/components/hud/SeedGate.tsx` | Fix chip list markup (F1). Remove or defer `autoFocus` (F5). Prefer reduced-safe `initial` opacity 1 (F9 / motion). |
-| `apps/web/src/components/ui/AtelierApp.tsx` | Move `<SkipLink />` before `<main>`; add stable `id="chamber-controls"` on exits nav when ready (F5). Fix character-key shortcut compliance (F2). Ensure map open/close integrates with dialog focus restore (F3). |
-| `apps/web/src/components/hud/ConstellationMap.tsx` | Focus trap + initial focus + restore; inert background while `aria-modal` (F3). |
-| `apps/web/src/components/a11y/SkipLink.tsx` | Update `href` to `#chamber-controls` (F5). |
-| `apps/web/src/app/globals.css` | `.exit-hot .exit-index { color: var(--ink); }` (or darker danger) (F4). Keep `:focus-visible` + `@media (prefers-reduced-motion: reduce)` blocks. |
+| `apps/web/src/components/ui/AtelierApp.tsx` | SkipLink before `<main>`; gate `#seed-input` / chamber `#chamber-controls` (F5). Digit/`M` shortcuts only when focus in `#chamber-controls` (F2). `#main` `inert` while map open (F3). |
+| `apps/web/src/components/hud/ConstellationMap.tsx` | Focus trap + initial focus + restore; dialog outside inert `#main` (F3). |
+| `apps/web/src/components/a11y/SkipLink.tsx` | Props for `href`/`label` — gate “Skip to seed”, chamber “Skip to chamber controls” (F5). |
+| `apps/web/src/app/globals.css` | `--danger` fill `#c62828`; `--danger-text` `#ff4d6d`; hot index white-on-danger (F4). Keep `:focus-visible` + `@media (prefers-reduced-motion: reduce)` blocks. |
 | `apps/web/src/components/hud/ChamberHud.tsx` | Add `id="chamber-controls"` on `nav.exits` (F5). (Heading/live-region cleanups F6/F8 are moderate — do after criticals.) |
 | `apps/web/src/hooks/use-reduced-motion.ts` | Optional: `getServerSnapshot → true` or document PRM-safe SSR strategy (F9). |
 | `apps/web/src/components/engine/DepthField.tsx` | No critical defect if PRM respected; optional pause control (F10). |

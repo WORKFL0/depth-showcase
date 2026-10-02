@@ -1,7 +1,13 @@
-export function SkipLink() {
+export function SkipLink({
+  href = "#chamber-controls",
+  label = "Skip to chamber controls",
+}: {
+  href?: string;
+  label?: string;
+}) {
   return (
-    <a href="#chamber-controls" className="skip-link">
-      Skip to chamber controls
+    <a href={href} className="skip-link">
+      {label}
     </a>
   );
 }
