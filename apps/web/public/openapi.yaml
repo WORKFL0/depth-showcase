@@ -1,0 +1,335 @@
+openapi: 3.0.3
+info:
+  title: Depth Engine API
+  version: 0.1.0
+  description: |
+    Generative infinite-descent API for the Workflo depth-showcase.
+    Contract source of truth: packages/api (Zod). This file mirrors HTTP shapes.
+servers:
+  - url: http://localhost:3456
+    description: Local Next.js app
+paths:
+  /api/health:
+    get:
+      summary: Liveness
+      operationId: getHealth
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+  /api/seed:
+    get:
+      summary: Create or recall a seeded world (query)
+      operationId: getSeed
+      parameters:
+        - name: seed
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 128
+          description: Omit or empty to generate a random seed
+      responses:
+        "200":
+          description: SeedManifest
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeedManifest"
+    post:
+      summary: Create or recall a seeded world (body)
+      operationId: postSeed
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                seed:
+                  type: string
+                  maxLength: 128
+      responses:
+        "200":
+          description: SeedManifest
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeedManifest"
+  /api/chamber/{id}:
+    get:
+      summary: Fetch a chamber by id
+      operationId: getChamber
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Full chamber id including hint suffix from seed/exits
+        - name: seed
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Only resolves root when id lacks a hint
+      responses:
+        "200":
+          description: Chamber
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chamber"
+        "404":
+          description: Unknown chamber
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorBody"
+  /api/dive:
+    post:
+      summary: Stream a dive as Server-Sent Events
+      operationId: postDive
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiveRequest"
+      responses:
+        "200":
+          description: SSE stream of DiveEvent (plus a final {type:done})
+          content:
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/DiveEvent"
+        "400":
+          description: Invalid body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorBody"
+        "404":
+          description: Unknown fromChamberId
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorBody"
+  /api/constellation:
+    get:
+      summary: BFS graph of chambers from a seed
+      operationId: getConstellation
+      parameters:
+        - name: seed
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Constellation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Constellation"
+components:
+  schemas:
+    Health:
+      type: object
+      required: [ok, service, version]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        service:
+          type: string
+          enum: [depth-engine]
+        version:
+          type: string
+          example: "0.1.0"
+    SeedManifest:
+      type: object
+      required: [seed, hash, palette, rootChamberId, laws, createdAt]
+      properties:
+        seed:
+          type: string
+        hash:
+          type: string
+        palette:
+          type: array
+          items:
+            type: string
+        rootChamberId:
+          type: string
+        laws:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+    Phenomenon:
+      type: object
+      required: [kind, intensity, label]
+      properties:
+        kind:
+          type: string
+          enum: [light, echo, gravity, memory, silence, fracture]
+        intensity:
+          type: number
+          minimum: 0
+          maximum: 1
+        label:
+          type: string
+        detail:
+          type: string
+    Exit:
+      type: object
+      required: [label, targetIdHint, risk]
+      properties:
+        label:
+          type: string
+        targetIdHint:
+          type: string
+        risk:
+          type: number
+          minimum: 0
+          maximum: 1
+    Chamber:
+      type: object
+      required: [id, depth, title, seed, phenomena, exits, resonance]
+      properties:
+        id:
+          type: string
+        depth:
+          type: number
+        title:
+          type: string
+        seed:
+          type: string
+        phenomena:
+          type: array
+          items:
+            $ref: "#/components/schemas/Phenomenon"
+        exits:
+          type: array
+          items:
+            $ref: "#/components/schemas/Exit"
+        resonance:
+          type: number
+        paradox:
+          type: boolean
+        whisper:
+          type: string
+    DiveRequest:
+      type: object
+      required: [fromChamberId]
+      properties:
+        fromChamberId:
+          type: string
+        choiceIndex:
+          type: integer
+        intensity:
+          type: number
+          description: Clamped to [0,1]
+    DiveEvent:
+      oneOf:
+        - type: object
+          required: [type, chamber, at]
+          properties:
+            type:
+              enum: [enter]
+            chamber:
+              $ref: "#/components/schemas/Chamber"
+            at:
+              type: string
+              format: date-time
+        - type: object
+          required: [type, phenomenon, at]
+          properties:
+            type:
+              enum: [phenomenon]
+            phenomenon:
+              $ref: "#/components/schemas/Phenomenon"
+            at:
+              type: string
+              format: date-time
+        - type: object
+          required: [type, text, at]
+          properties:
+            type:
+              enum: [whisper]
+            text:
+              type: string
+            at:
+              type: string
+              format: date-time
+        - type: object
+          required: [type, exits, at]
+          properties:
+            type:
+              enum: [fork]
+            exits:
+              type: array
+              items:
+                $ref: "#/components/schemas/Exit"
+            at:
+              type: string
+              format: date-time
+        - type: object
+          required: [type, reason, at]
+          properties:
+            type:
+              enum: [surface]
+            reason:
+              type: string
+            at:
+              type: string
+              format: date-time
+    ConstellationNode:
+      type: object
+      required: [id, depth, title]
+      properties:
+        id:
+          type: string
+        depth:
+          type: number
+        title:
+          type: string
+        paradox:
+          type: boolean
+    ConstellationEdge:
+      type: object
+      required: [from, to, label]
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+        label:
+          type: string
+    Constellation:
+      type: object
+      required: [seed, nodes, edges]
+      properties:
+        seed:
+          type: string
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConstellationNode"
+        edges:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConstellationEdge"
+    ErrorBody:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+        hint:
+          type: string
