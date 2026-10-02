@@ -116,40 +116,22 @@ export function CockpitShell({
   return (
     <>
       <SkipLink href="#day-brief" label="Ga naar ochtendbrief" />
-      <main className="cockpit">
-        <header className="cockpit-top">
-          <div className="cockpit-brand">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/brand/logos/logo-horizontal-on-dark-sm.png"
-              alt="Workflo"
-              className="cockpit-logo"
-              width={140}
-              height={28}
-            />
-            <p className="cockpit-greeting">
-              Ochtend · <strong>Florian</strong>
-            </p>
+      <main className="floor-brief floor-pad">
+        <header className="floor-brief__intro">
+          <div>
+            <p className="floor-kicker">Briefverdieping</p>
+            <p className="floor-brief__hello">De ochtend, gelezen.</p>
           </div>
-          <div className="cockpit-top__actions">
+          <div className="floor-brief__meta">
+            <span>Ochtend · Florian</span>
             <span className={`health-chip ${healthClass}`} title="API health">
               {healthLabel}
             </span>
-            <Link className="btn-ghost cockpit-link" href="/">
-              Diepte
-            </Link>
-            <Link className="btn-ghost cockpit-link" href="/sales">
-              Offerte
-            </Link>
-            <Link className="cockpit-atelier-link" href="/atelier">
-              Atelier (experiment)
-            </Link>
           </div>
         </header>
 
-        <div className="cockpit-grid">
+        <div className="floor-brief__split">
           <div className="cockpit-hero-col">
-            <p className="cockpit-kicker">Company OS · beslissingen · sales · bots</p>
             <CeoDayBriefPanel brief={brief} variant="hero" />
           </div>
           <aside className="cockpit-rail" aria-label="Diepere surfaces">
@@ -157,7 +139,7 @@ export function CockpitShell({
             <div className="cockpit-offerte-wrap">
               <DemoOfferteCard offerte={offerte ?? DEMO_OFFERTE} />
               <Link className="cockpit-rail-link" href="/sales">
-                Volledige sales craft →
+                Volledige salesverdieping
               </Link>
             </div>
             {handoff ? <HandoffCard card={handoff} /> : null}
@@ -166,11 +148,10 @@ export function CockpitShell({
 
         <BotRoster />
 
-        <footer className="cockpit-foot">
+        <footer className="floor-brief__foot">
           <p>
-            Workflo B.V. · depth-showcase als CEO cockpit.{" "}
-            <Link href="/atelier">Atelier (experiment)</Link> blijft beschikbaar
-            achter deze link — niet de pitch.
+            Workflo B.V. · dezelfde schacht als de voorpagina. Experiment en sales
+            zitten in de navigatie, niet in een tweede huid.
           </p>
         </footer>
         <LiveRegion message={`Ochtendbrief geladen · ${brief.sections.mustDo.length} moet vandaag`} />
