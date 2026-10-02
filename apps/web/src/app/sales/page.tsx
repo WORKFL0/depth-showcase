@@ -1,29 +1,24 @@
-import Link from "next/link";
+import type { Metadata } from "next";
+import { BuildingShell } from "@/components/building/BuildingShell";
 import { DemoOfferteCard } from "@/components/sales/DemoOfferteCard";
 import { DEMO_OFFERTE } from "@/components/sales/demo-offerte";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Sales craft — Demo Halo offerte",
   description: "Demo quote card. Fiction only. Workflo sales craft.",
 };
 
 export default function SalesPage() {
   return (
-    <main className="sales-shell">
-      <nav className="sales-nav">
-        <Link href="/brief">← Ochtendbrief</Link>
-        <span>
-          <code>DEMO_OFFERTE</code> · hard-atelier
-        </span>
-      </nav>
-      <header className="sales-hero">
-        <p className="sales-kicker">Workflo · Quote Helper</p>
-        <h1>Demo offerte</h1>
-        <p>
+    <BuildingShell floor="sales">
+      <main className="floor-sales floor-pad">
+        <p className="floor-kicker">Salesverdieping</p>
+        <h1 className="floor-sales__title">Demo offerte</h1>
+        <p className="floor-sales__lede">
           Fiction-only Halo-flavored quote voor de sales craft. Niet versturen.
         </p>
-      </header>
-      <DemoOfferteCard offerte={DEMO_OFFERTE} />
-    </main>
+        <DemoOfferteCard offerte={DEMO_OFFERTE} />
+      </main>
+    </BuildingShell>
   );
 }
