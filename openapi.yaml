@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Depth Engine API
-  version: 0.1.0
+  version: 0.2.0
   description: |
     Generative infinite-descent API for the Workflo depth-showcase.
     Contract source of truth: packages/api (Zod). This file mirrors HTTP shapes.
@@ -135,11 +135,62 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Constellation"
+  /api/session:
+    post:
+      summary: Create signed exploration session
+      operationId: postSession
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                seed: { type: string, maxLength: 128 }
+      responses:
+        "200":
+          description: Session + manifest + chamber + token
+    get:
+      summary: Load session
+      operationId: getSession
+      parameters:
+        - name: id
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Session + chamber
+    patch:
+      summary: Visit chamber / unlock edge
+      operationId: patchSession
+      responses:
+        "200":
+          description: Updated session
+  /api/ceo-day-brief:
+    get:
+      summary: CEO Day Brief panel
+      operationId: getCeoDayBrief
+      parameters:
+        - name: trigger
+          in: query
+          schema:
+            type: string
+            enum: [tesla_car_entry, manual, preview]
+      responses:
+        "200":
+          description: CeoDayBrief
+  /api/showcase/handoff:
+    get:
+      summary: Showcase handoff panel
+      operationId: getShowcaseHandoff
+      responses:
+        "200":
+          description: HandoffPanel
+
 components:
   schemas:
     Health:
       type: object
-      required: [ok, service, version]
+      required: [ok, service, version, storeMode]
       properties:
         ok:
           type: boolean
@@ -149,7 +200,10 @@ components:
           enum: [depth-engine]
         version:
           type: string
-          example: "0.1.0"
+          example: "0.2.0"
+        storeMode:
+          type: string
+          enum: [memory, file]
     SeedManifest:
       type: object
       required: [seed, hash, palette, rootChamberId, laws, createdAt]
@@ -235,6 +289,8 @@ components:
         intensity:
           type: number
           description: Clamped to [0,1]
+        sessionId:
+          type: string
     DiveEvent:
       oneOf:
         - type: object

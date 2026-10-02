@@ -1,10 +1,15 @@
 import type {
+  CeoDayBrief,
   Chamber,
   Constellation,
   DiveEvent,
   DiveRequest,
   Health,
+  HandoffPanel,
   SeedManifest,
+  Session,
+  SessionPatch,
+  SessionResponse,
 } from "@depth-showcase/api";
 
 async function json<T>(res: Response): Promise<T> {
@@ -29,7 +34,43 @@ export async function postSeed(seed?: string): Promise<SeedManifest> {
   );
 }
 
-/** Chamber ids can be long / hint-embedded — always URL-encode. */
+export async function createSession(seed?: string): Promise<SessionResponse> {
+  return json(
+    await fetch("/api/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(seed ? { seed } : {}),
+    }),
+  );
+}
+
+export async function fetchSession(sessionId: string): Promise<SessionResponse> {
+  return json(
+    await fetch(`/api/session?id=${encodeURIComponent(sessionId)}`, {
+      credentials: "include",
+      headers: { Authorization: `Bearer ${sessionId}` },
+    }),
+  );
+}
+
+export async function patchSessionApi(
+  sessionId: string,
+  body: SessionPatch,
+): Promise<{ session: Session; token?: string }> {
+  return json(
+    await fetch("/api/session", {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionId}`,
+      },
+      body: JSON.stringify(body),
+    }),
+  );
+}
+
 export async function fetchChamber(
   id: string,
   seed?: string,
@@ -38,10 +79,24 @@ export async function fetchChamber(
   return json(await fetch(`/api/chamber/${encodeURIComponent(id)}${q}`));
 }
 
-export async function fetchConstellation(seed: string): Promise<Constellation> {
-  return json(
-    await fetch(`/api/constellation?seed=${encodeURIComponent(seed)}`),
-  );
+export async function fetchConstellation(
+  seed: string,
+  sessionId?: string,
+): Promise<Constellation> {
+  const params = new URLSearchParams({ seed });
+  if (sessionId) params.set("sessionId", sessionId);
+  return json(await fetch(`/api/constellation?${params}`));
+}
+
+export async function getCeoDayBrief(
+  trigger?: "preview" | "manual" | "tesla_car_entry",
+): Promise<CeoDayBrief> {
+  const q = trigger ? `?trigger=${encodeURIComponent(trigger)}` : "";
+  return json(await fetch(`/api/ceo-day-brief${q}`));
+}
+
+export async function getShowcaseHandoff(): Promise<HandoffPanel> {
+  return json(await fetch("/api/showcase/handoff"));
 }
 
 export type DiveHandlers = {
@@ -50,7 +105,6 @@ export type DiveHandlers = {
   onError?: (err: Error) => void;
 };
 
-/** Consume POST /api/dive as SSE (Backend emits `data: {...}` frames). */
 export async function diveStream(
   body: DiveRequest,
   _seed: string | undefined,
@@ -59,16 +113,9 @@ export async function diveStream(
 ): Promise<void> {
   const res = await fetch(`/api/dive`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "text/event-stream",
-    },
-    body: JSON.stringify({
-      ...body,
-      // fromChamberId is in JSON body; still keep ids opaque/encoded when
-      // they ever appear in query/path elsewhere.
-      fromChamberId: body.fromChamberId,
-    }),
+    headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
+    credentials: "include",
+    body: JSON.stringify(body),
     signal,
   });
   if (!res.ok || !res.body) {
@@ -78,13 +125,6 @@ export async function diveStream(
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
-  let finished = false;
-
-  const finish = () => {
-    if (finished) return;
-    finished = true;
-    handlers.onDone?.();
-  };
 
   while (true) {
     const { done, value } = await reader.read();
@@ -100,7 +140,7 @@ export async function diveStream(
       try {
         const parsed = JSON.parse(raw) as DiveEvent | { type: "done" };
         if (parsed.type === "done") {
-          finish();
+          handlers.onDone?.();
           continue;
         }
         handlers.onEvent(parsed as DiveEvent);
@@ -109,5 +149,5 @@ export async function diveStream(
       }
     }
   }
-  finish();
+  handlers.onDone?.();
 }

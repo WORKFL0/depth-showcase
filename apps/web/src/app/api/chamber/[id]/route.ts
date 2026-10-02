@@ -4,8 +4,8 @@ import { generateChamber, resolveChamberRef } from "@/lib/engine";
 
 export const dynamic = "force-dynamic";
 
-export function OPTIONS() {
-  return optionsCors();
+export function OPTIONS(req: Request) {
+  return optionsCors(req);
 }
 
 export async function GET(
@@ -25,15 +25,13 @@ export async function GET(
         hint: "Pass a full chamber id from /api/seed or an exit.targetIdHint (includes hint:…). Optional ?seed= only resolves the root.",
       },
       { status: 404 },
+      req,
     );
   }
 
-  // If caller passed opaque ch_hash without hint, only root is valid when seed given
   if (!id.includes("hint:") && !id.startsWith("hint:") && seedQ) {
     const root = generateChamber(resolved.seed, []);
-    // Accept if they asked for root id prefix
     if (!root.id.startsWith(id.split("|")[0]!) && id !== root.id) {
-      // still allow exact root prefix match
       const rootOpaque = root.id.split("|")[0]!;
       if (id !== rootOpaque && !id.startsWith(rootOpaque)) {
         return withCors(
@@ -42,6 +40,7 @@ export async function GET(
             hint: "Without a hint suffix, only the root chamber can be fetched via ?seed=",
           },
           { status: 404 },
+          req,
         );
       }
     }
@@ -53,7 +52,8 @@ export async function GET(
     return withCors(
       { error: "chamber invalid", hint: parsed.error.message },
       { status: 500 },
+      req,
     );
   }
-  return withCors(parsed.data);
+  return withCors(parsed.data, undefined, req);
 }

@@ -1,0 +1,65 @@
+{
+  "panel": "ceo_day_brief",
+  "version": "1.0",
+  "generatedAt": "2026-10-02T07:12:00+02:00",
+  "trigger": "preview",
+  "headline": "Three moves before noon — one needs your call.",
+  "sections": {
+    "mustDo": [
+      {
+        "id": "md-1",
+        "title": "Confirm Q4 MSP pricing for Prospect Atlas",
+        "why": "Quote Helper draft is ready; client call is 11:00.",
+        "due": "2026-10-02T11:00:00+02:00",
+        "owner": "Florian",
+        "ref": "handoffs/2026-10-01-atlas-quote"
+      },
+      {
+        "id": "md-2",
+        "title": "Ship OS Cartographer INDEX refresh",
+        "why": "Two new chambers landed overnight; map is stale for the team.",
+        "owner": "OS Cartographer",
+        "ref": "workbot/INDEX.md"
+      },
+      {
+        "id": "md-3",
+        "title": "Review Backend API contract for Day Brief feed",
+        "why": "Frontend is blocked on the chamber payload shape.",
+        "owner": "Backend Developer",
+        "ref": "workflo-os/api/ceo-day-brief"
+      }
+    ],
+    "stuck": [
+      {
+        "id": "st-1",
+        "title": "Tesla → Day Brief webhook",
+        "blocker": "Car-entry event not wired to webhook yet.",
+        "waitingOn": "Jurre / Tesla integration",
+        "since": "2026-10-02T20:30:00+02:00",
+        "ref": "routine:ceo-day-brief-on-car-entry"
+      },
+      {
+        "id": "st-2",
+        "title": "ADR: agent handoff ownership",
+        "blocker": "Decision only lived in chat — no drafted ADR.",
+        "waitingOn": "Decision Clerk",
+        "since": "2026-09-28T09:00:00+02:00",
+        "ref": "decisions/pending/handoff-ownership"
+      }
+    ],
+    "stepIn": [
+      {
+        "id": "si-1",
+        "title": "Approve CEO Copilot chamber in OS stack",
+        "decision": "Greenlight sample Day Brief panel for depth-showcase?",
+        "context": "Schema + sample payload ready for Backend to serve and Frontend to render. No live car-entry fires until Tesla wiring lands.",
+        "urgency": "today",
+        "ref": "depth-showcase/ceo-copilot"
+      }
+    ]
+  },
+  "meta": {
+    "sources": ["calendar", "handoffs", "index_flags", "decisions"],
+    "empty": false
+  }
+}

@@ -6,17 +6,20 @@ import type {
   Constellation,
   DiveEvent,
   SeedManifest,
+  Session,
 } from "@depth-showcase/api";
 import {
+  createSession,
   diveStream,
   fetchChamber,
   fetchConstellation,
-  postSeed,
 } from "@/lib/client-api";
 
 export type SessionState = {
   status: "idle" | "seeding" | "ready" | "diving" | "error";
   manifest: SeedManifest | null;
+  session: Session | null;
+  sessionToken: string | null;
   chamber: Chamber | null;
   constellation: Constellation | null;
   whispers: string[];
@@ -28,6 +31,8 @@ export type SessionState = {
 const initial: SessionState = {
   status: "idle",
   manifest: null,
+  session: null,
+  sessionToken: null,
   chamber: null,
   constellation: null,
   whispers: [],
@@ -39,21 +44,22 @@ const initial: SessionState = {
 export function useDepthSession() {
   const [state, setState] = useState<SessionState>(initial);
   const abortRef = useRef<AbortController | null>(null);
-  const seedRef = useRef<string | null>(null);
-  // Keep latest chamber/manifest for dive without stale closures
-  const chamberRef = useRef<Chamber | null>(null);
-  const manifestRef = useRef<SeedManifest | null>(null);
-  chamberRef.current = state.chamber;
-  manifestRef.current = state.manifest;
+  const sessionRef = useRef<string | null>(null);
 
-  const refreshConstellation = useCallback(async (seed: string) => {
-    try {
-      const constellation = await fetchConstellation(seed);
-      setState((s) => ({ ...s, constellation }));
-    } catch {
-      /* non-fatal */
-    }
-  }, []);
+  const refreshConstellation = useCallback(
+    async (seed: string, sessionId?: string | null) => {
+      try {
+        const constellation = await fetchConstellation(
+          seed,
+          sessionId || undefined,
+        );
+        setState((s) => ({ ...s, constellation }));
+      } catch {
+        /* non-fatal */
+      }
+    },
+    [],
+  );
 
   const seedWorld = useCallback(
     async (seed?: string) => {
@@ -66,15 +72,17 @@ export function useDepthSession() {
         mapOpen: false,
       }));
       try {
-        const manifest = await postSeed(seed?.trim() || undefined);
-        seedRef.current = manifest.seed;
-        const chamber = await fetchChamber(
-          manifest.rootChamberId,
-          manifest.seed,
-        );
+        const res = await createSession(seed?.trim() || undefined);
+        const manifest = res.manifest!;
+        const chamber =
+          res.chamber ||
+          (await fetchChamber(manifest.rootChamberId, manifest.seed));
+        sessionRef.current = res.token || res.session.id;
         setState({
           status: "ready",
           manifest,
+          session: res.session,
+          sessionToken: res.token || res.session.id,
           chamber,
           constellation: null,
           whispers: chamber.whisper ? [chamber.whisper] : [],
@@ -82,7 +90,7 @@ export function useDepthSession() {
           error: null,
           mapOpen: false,
         });
-        void refreshConstellation(manifest.seed);
+        void refreshConstellation(manifest.seed, sessionRef.current);
       } catch (e) {
         setState((s) => ({
           ...s,
@@ -96,9 +104,7 @@ export function useDepthSession() {
 
   const dive = useCallback(
     async (choiceIndex: number, intensity = 0.55) => {
-      const chamber = chamberRef.current;
-      const manifest = manifestRef.current;
-      if (!chamber || !manifest) return;
+      if (!state.chamber || !state.manifest) return;
       abortRef.current?.abort();
       const ac = new AbortController();
       abortRef.current = ac;
@@ -111,13 +117,15 @@ export function useDepthSession() {
       }));
 
       const collected: DiveEvent[] = [];
-      const seed = manifest.seed;
+      const seed = state.manifest.seed;
+      const sessionId = sessionRef.current || state.sessionToken || undefined;
       try {
         await diveStream(
           {
-            fromChamberId: chamber.id,
+            fromChamberId: state.chamber.id,
             choiceIndex,
             intensity,
+            ...(sessionId ? { sessionId } : {}),
           },
           seed,
           {
@@ -142,7 +150,7 @@ export function useDepthSession() {
             },
             onDone: () => {
               setState((s) => ({ ...s, status: "ready" }));
-              void refreshConstellation(seed);
+              void refreshConstellation(seed, sessionId);
             },
             onError: (err) => {
               setState((s) => ({
@@ -163,20 +171,25 @@ export function useDepthSession() {
         }));
       }
     },
-    [refreshConstellation],
+    [state.chamber, state.manifest, state.sessionToken, refreshConstellation],
   );
 
   const toggleMap = useCallback(() => {
     setState((s) => {
       if (!s.manifest) return s;
-      if (!s.mapOpen) void refreshConstellation(s.manifest.seed);
+      if (!s.mapOpen) {
+        void refreshConstellation(
+          s.manifest.seed,
+          sessionRef.current || s.sessionToken,
+        );
+      }
       return { ...s, mapOpen: !s.mapOpen };
     });
   }, [refreshConstellation]);
 
   const reset = useCallback(() => {
     abortRef.current?.abort();
-    seedRef.current = null;
+    sessionRef.current = null;
     setState(initial);
   }, []);
 

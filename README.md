@@ -1,29 +1,22 @@
 # depth-showcase
 
-Overnight capability showcase for Workflo OS — **Depth Atelier**.
+Depth Atelier — generative API + Atelier UI. Zod contract: `packages/api`.
 
-**Depth Engine** (Backend): generative infinite-descent API — seeds, chambers, SSE dive streams, constellation graphs. Zod contract in `packages/api` + `openapi.yaml`.
+## Endpoints
 
-**Atelier UI** (Frontend): spatial chamber explorer (R3F + Framer-ready HUD), Workflo brand (`#F2F400` / `#0A0A0A` / Navigo / hard shadows).
+| Method | Path | Notes |
+|--------|------|--------|
+| GET | `/api/health` | ok, version, storeMode |
+| POST | `/api/seed` | SeedManifest |
+| POST/GET/PATCH | `/api/session` | signed session + discoveries |
+| GET | `/api/chamber/:id` | Chamber |
+| POST | `/api/dive` | SSE DiveEvent (+ sessionId updates graph) |
+| GET | `/api/constellation` | procedural or `?sessionId=` discovered |
+| GET | `/api/ceo-day-brief` | CEO Day Brief panel sample |
+| GET | `/api/showcase/handoff` | Handoff panel envelope |
 
-## Contract (v0.1)
-
-- `GET|POST /api/seed` → `SeedManifest`
-- `GET /api/chamber/:id` → `Chamber`
-- `POST /api/dive` → SSE `DiveEvent` stream
-- `GET /api/constellation?seed=` → graph (~depth 6)
-- `GET /api/health`
-
-No secrets / `.env` in git (see `.env.example`). Deploy: Vercel.
-
-## Local
+Persistence: MemorySessionStore (Vercel) or FileSessionStore via `DEPTH_SESSION_DIR`. Sessions HMAC-signed (`DEPTH_SESSION_SECRET`).
 
 ```bash
-pnpm install
-pnpm --filter web dev   # http://localhost:3456
+pnpm install && pnpm --filter web dev   # :3456
 ```
-
-## Monorepo
-
-- `packages/api` — frozen Zod schemas (`@depth-showcase/api`)
-- `apps/web` — Next.js 15 App Router (API routes + Atelier UI)

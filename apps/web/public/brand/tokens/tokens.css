@@ -1,0 +1,61 @@
+/* Workflo brand tokens — site kit
+ * Canon: accent yellow scarce; text-on-yellow = black only.
+ * NEVER navy #0A1628 or gold #FFD700. Fog is #6B6B6B (not #9A9A9A).
+ */
+:root {
+  /* Accent */
+  --wf-yellow: #F2F400;
+  --wf-yellow-ink: #DADA00;
+  --wf-yellow-tint: #FAFBC2;
+
+  /* Neutrals */
+  --wf-black: #0A0A0A;
+  --wf-ink: #1A1A1A;
+  --wf-graphite: #2B2B2B;
+  --wf-steel: #5C5C5C;
+  --wf-fog: #6B6B6B;
+  --wf-mist: #D6D6D6;
+  --wf-bone: #EFEFEF;
+  --wf-paper: #F7F7F5;
+  --wf-white: #FFFFFF;
+
+  /* Domain (cyber series only — label usage) */
+  --wf-cyber: #00FF88;
+
+  /* Form */
+  --wf-radius: 0px;          /* prefer square; max 4px if needed */
+  --wf-radius-max: 4px;
+  --wf-shadow-hard: 6px 6px 0 var(--wf-black);
+  --wf-shadow-hard-yellow: 6px 6px 0 var(--wf-yellow);
+
+  /* Type */
+  --wf-font-display: "Navigo", system-ui, sans-serif;
+  --wf-font-body: "Navigo", system-ui, sans-serif;
+  --wf-tracking-eyebrow: 0.16em;
+  --wf-tracking-cta: 0.04em;
+  --wf-weight-display: 900;
+  --wf-weight-bold: 700;
+
+  /* Semantic */
+  --wf-bg: var(--wf-paper);
+  --wf-fg: var(--wf-black);
+  --wf-muted: var(--wf-fog);
+  --wf-accent: var(--wf-yellow);
+  --wf-accent-fg: var(--wf-black); /* text on yellow = BLACK only */
+}
+
+/* Helpers */
+.wf-text-on-yellow { color: var(--wf-black); background: var(--wf-yellow); }
+.wf-shadow-hard { box-shadow: var(--wf-shadow-hard); }
+.wf-shadow-hard-yellow { box-shadow: var(--wf-shadow-hard-yellow); }
+.wf-eyebrow {
+  font-family: var(--wf-font-body);
+  font-weight: var(--wf-weight-bold);
+  letter-spacing: var(--wf-tracking-eyebrow);
+  text-transform: uppercase;
+}
+.wf-display {
+  font-family: var(--wf-font-display);
+  font-weight: var(--wf-weight-display);
+  letter-spacing: -0.02em;
+}

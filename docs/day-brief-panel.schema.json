@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://workflo.local/schemas/ceo-day-brief-panel.json",
+  "title": "CEO Day Brief Panel",
+  "description": "Content schema for the Daily CEO Copilot chamber: must-do / stuck / step-in. Backend serves; Frontend renders.",
+  "type": "object",
+  "required": ["panel", "version", "generatedAt", "trigger", "sections"],
+  "properties": {
+    "panel": { "const": "ceo_day_brief" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+$" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "trigger": {
+      "type": "string",
+      "enum": ["tesla_car_entry", "manual", "preview"]
+    },
+    "headline": {
+      "type": "string",
+      "maxLength": 120,
+      "description": "One-line orientation for the chamber header"
+    },
+    "sections": {
+      "type": "object",
+      "required": ["mustDo", "stuck", "stepIn"],
+      "additionalProperties": false,
+      "properties": {
+        "mustDo": {
+          "type": "array",
+          "maxItems": 5,
+          "items": { "$ref": "#/$defs/mustDoItem" }
+        },
+        "stuck": {
+          "type": "array",
+          "maxItems": 5,
+          "items": { "$ref": "#/$defs/stuckItem" }
+        },
+        "stepIn": {
+          "type": "array",
+          "maxItems": 5,
+          "items": { "$ref": "#/$defs/stepInItem" }
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["calendar", "handoffs", "index_flags", "decisions", "mail_urgency"]
+          }
+        },
+        "empty": { "type": "boolean", "description": "True when all sections are empty — UI may hide chamber" }
+      }
+    }
+  },
+  "$defs": {
+    "mustDoItem": {
+      "type": "object",
+      "required": ["id", "title"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string", "maxLength": 100 },
+        "why": { "type": "string", "maxLength": 200 },
+        "due": { "type": "string", "format": "date-time" },
+        "owner": { "type": "string" },
+        "ref": { "type": "string", "description": "Optional link into OS / calendar / handoff" }
+      }
+    },
+    "stuckItem": {
+      "type": "object",
+      "required": ["id", "title", "blocker"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string", "maxLength": 100 },
+        "blocker": { "type": "string", "maxLength": 200 },
+        "waitingOn": { "type": "string" },
+        "since": { "type": "string", "format": "date-time" },
+        "ref": { "type": "string" }
+      }
+    },
+    "stepInItem": {
+      "type": "object",
+      "required": ["id", "title", "decision"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string", "maxLength": 100 },
+        "decision": { "type": "string", "maxLength": 200 },
+        "context": { "type": "string", "maxLength": 280 },
+        "urgency": { "type": "string", "enum": ["today", "this_week", "when_free"] },
+        "ref": { "type": "string" }
+      }
+    }
+  }
+}
