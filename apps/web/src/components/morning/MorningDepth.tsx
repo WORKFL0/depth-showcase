@@ -219,18 +219,6 @@ export function MorningDepth({ displayClass, monoClass }: Props) {
         aria-hidden="true"
       />
       <div className="morning-depth__grain" aria-hidden="true" />
-      <nav className={`morning-depth__nav ${monoClass}`} aria-label="Workflo">
-        <Link className="morning-depth__brand" href="/">
-          Workflo
-        </Link>
-        <div className="morning-depth__links">
-          <Link href="/" aria-current="page">
-            Diepte
-          </Link>
-          <Link href="/brief">Brief</Link>
-          <Link href="/atelier">Experiment</Link>
-        </div>
-      </nav>
       <div className="morning-depth__stage">
         <div>
           <p className={`morning-depth__kicker morning-depth__rise ${monoClass}`}>

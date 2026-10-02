@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BuildingShell } from "@/components/building/BuildingShell";
 import { MorningDepth } from "@/components/morning/MorningDepth";
 import { depthDisplay, depthMono } from "@/lib/depth-fonts";
 
@@ -11,9 +12,11 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <MorningDepth
-      displayClass={depthDisplay.className}
-      monoClass={depthMono.className}
-    />
+    <BuildingShell floor="diepte" variant="canvas">
+      <MorningDepth
+        displayClass={depthDisplay.className}
+        monoClass={depthMono.className}
+      />
+    </BuildingShell>
   );
 }
