@@ -148,9 +148,20 @@ export function useDepthSession() {
                 return next;
               });
             },
+            onSession: (session, token) => {
+              sessionRef.current = token;
+              setState((s) => ({
+                ...s,
+                session,
+                sessionToken: token,
+              }));
+            },
             onDone: () => {
               setState((s) => ({ ...s, status: "ready" }));
-              void refreshConstellation(seed, sessionId);
+              void refreshConstellation(
+                seed,
+                sessionRef.current || sessionId,
+              );
             },
             onError: (err) => {
               setState((s) => ({

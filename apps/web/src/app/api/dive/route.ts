@@ -8,7 +8,7 @@ import {
   releaseDive,
   tooManyResponse,
 } from "@/lib/rate-limit";
-import { recordDiveVisit } from "@/lib/session";
+import { loadSession, recordDiveVisit, signSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -101,6 +101,17 @@ export async function POST(req: Request) {
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify(event)}\n\n`),
           );
+        }
+        if (sessionId) {
+          const latest = await loadSession(sessionId);
+          if (latest) {
+            const token = signSession(latest);
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({ type: "session", session: latest, token })}\n\n`,
+              ),
+            );
+          }
         }
         controller.enqueue(
           encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`),

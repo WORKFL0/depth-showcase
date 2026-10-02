@@ -101,6 +101,7 @@ export async function getShowcaseHandoff(): Promise<HandoffPanel> {
 
 export type DiveHandlers = {
   onEvent: (event: DiveEvent) => void;
+  onSession?: (session: Session, token: string) => void;
   onDone?: () => void;
   onError?: (err: Error) => void;
 };
@@ -138,9 +139,16 @@ export async function diveStream(
       const raw = dataLine.slice(5).trim();
       if (!raw) continue;
       try {
-        const parsed = JSON.parse(raw) as DiveEvent | { type: "done" };
+        const parsed = JSON.parse(raw) as
+          | DiveEvent
+          | { type: "done" }
+          | { type: "session"; session: Session; token: string };
         if (parsed.type === "done") {
           handlers.onDone?.();
+          continue;
+        }
+        if (parsed.type === "session") {
+          handlers.onSession?.(parsed.session, parsed.token);
           continue;
         }
         handlers.onEvent(parsed as DiveEvent);

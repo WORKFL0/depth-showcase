@@ -78,6 +78,14 @@ export async function loadSession(idOrToken: string): Promise<Session | null> {
   if (idOrToken.includes(".")) {
     const fromToken = verifySessionToken(idOrToken);
     if (fromToken) {
+      const cached = await store.get(fromToken.id);
+      if (
+        cached &&
+        new Date(cached.updatedAt).getTime() >=
+          new Date(fromToken.updatedAt).getTime()
+      ) {
+        return cached;
+      }
       await store.set(fromToken);
       return fromToken;
     }
@@ -91,6 +99,14 @@ export async function loadSession(idOrToken: string): Promise<Session | null> {
   if (bare) return bare;
   const again = verifySessionToken(idOrToken);
   if (again) {
+    const cached = await store.get(again.id);
+    if (
+      cached &&
+      new Date(cached.updatedAt).getTime() >=
+        new Date(again.updatedAt).getTime()
+    ) {
+      return cached;
+    }
     await store.set(again);
     return again;
   }
