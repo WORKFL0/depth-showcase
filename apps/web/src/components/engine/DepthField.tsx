@@ -96,10 +96,10 @@ function ParticleWake({
   useFrame(({ clock }) => {
     if (!ref.current || reduced) return;
     const t = clock.elapsedTime;
-    ref.current.rotation.y = t * 0.18 * (0.4 + ph.intensity);
-    ref.current.rotation.x = Math.sin(t * 0.22) * 0.25;
+    ref.current.rotation.y = t * 0.08 * (0.4 + ph.intensity);
+    ref.current.rotation.x = Math.sin(t * 0.12) * 0.12;
     const mat = ref.current.material as THREE.PointsMaterial;
-    mat.opacity = 0.4 + Math.sin(t * 1.4 + ph.intensity) * 0.2 + ph.intensity * 0.25;
+    mat.opacity = 0.45 + Math.sin(t * 0.55 + ph.intensity) * 0.1 + ph.intensity * 0.2;
   });
 
   return (
@@ -137,16 +137,16 @@ function GravityWell({
     if (reduced) return;
     const t = clock.elapsedTime;
     if (ref.current) {
-      const s = 0.82 + Math.sin(t * (1.1 + ph.intensity)) * 0.14;
+      const s = 0.92 + Math.sin(t * (0.45 + ph.intensity * 0.25)) * 0.06;
       ref.current.scale.setScalar(s);
-      ref.current.rotation.y = t * 0.35;
-      ref.current.rotation.x = t * 0.12;
+      ref.current.rotation.y = t * 0.12;
+      ref.current.rotation.x = t * 0.05;
     }
     if (halo.current) {
-      const s = 1.15 + Math.sin(t * 2.2) * 0.08;
+      const s = 1.08 + Math.sin(t * 0.7) * 0.04;
       halo.current.scale.setScalar(s);
       (halo.current.material as THREE.MeshBasicMaterial).opacity =
-        0.12 + Math.sin(t * 3) * 0.06;
+        0.12 + Math.sin(t * 0.9) * 0.03;
     }
   });
   const r = 0.42 + ph.intensity * 0.4;
@@ -192,8 +192,8 @@ function EchoLattice({
   useFrame(({ clock }) => {
     if (!group.current || reduced) return;
     const t = clock.elapsedTime;
-    group.current.rotation.z = t * 0.09;
-    group.current.rotation.y = t * 0.14;
+    group.current.rotation.z = t * 0.045;
+    group.current.rotation.y = t * 0.07;
   });
   const rings = reduced ? 3 : 6;
   return (
@@ -275,10 +275,10 @@ function SilenceOrb({
   useFrame(({ clock }) => {
     if (!ref.current || reduced) return;
     const t = clock.elapsedTime;
-    const s = 0.9 + Math.sin(t * 0.7) * 0.08;
+    const s = 0.96 + Math.sin(t * 0.4) * 0.04;
     ref.current.scale.setScalar(s);
     (ref.current.material as THREE.MeshStandardMaterial).opacity =
-      0.15 + Math.sin(t * 0.9) * 0.08 + ph.intensity * 0.2;
+      0.18 + Math.sin(t * 0.5) * 0.04 + ph.intensity * 0.18;
   });
   return (
     <mesh ref={ref} position={position}>
@@ -412,11 +412,13 @@ function ParadoxCore({
 
   useFrame(({ clock }) => {
     const t = clock.elapsedTime;
-    const pulse = 1 + Math.sin(t * (1.2 + chamber.resonance)) * 0.06 * chamber.resonance;
+    const pulse = reduced
+      ? 1
+      : 1 + Math.sin(t * (0.55 + chamber.resonance * 0.35)) * 0.035 * Math.max(0.35, chamber.resonance);
     if (a.current) {
       a.current.scale.setScalar(pulse);
-      a.current.rotation.y = reduced ? 0 : t * 0.18;
-      a.current.rotation.x = reduced ? 0 : Math.sin(t * 0.3) * 0.15;
+      a.current.rotation.y = reduced ? 0 : t * 0.08;
+      a.current.rotation.x = reduced ? 0 : Math.sin(t * 0.18) * 0.08;
     }
     if (chamber.paradox && !reduced) {
       const glitch = Math.sin(t * 17.3) > 0.82 ? 0.12 : 0.03;
@@ -443,9 +445,9 @@ function ParadoxCore({
 
   return (
     <Float
-      speed={reduced ? 0 : 1.1}
-      rotationIntensity={reduced ? 0 : 0.35}
-      floatIntensity={reduced ? 0 : 0.45}
+      speed={reduced ? 0 : 0.55}
+      rotationIntensity={reduced ? 0 : 0.18}
+      floatIntensity={reduced ? 0 : 0.22}
     >
       <mesh ref={a} position={[0, 0, -2.6]}>
         <icosahedronGeometry args={geoArgs} />
@@ -524,8 +526,8 @@ function ExitBeacons({
         return (
           <Float
             key={`${exit.label}-${i}`}
-            speed={reduced ? 0 : 0.8 + risk}
-            floatIntensity={reduced ? 0 : 0.25}
+            speed={reduced ? 0 : 0.35 + risk * 0.25}
+            floatIntensity={reduced ? 0 : 0.12}
             rotationIntensity={0}
           >
             <mesh position={[x, y, -1.4]}>
@@ -580,7 +582,7 @@ function NebulaDust({
 
   useFrame(({ clock }) => {
     if (!ref.current || reduced) return;
-    ref.current.rotation.y = clock.elapsedTime * 0.015;
+    ref.current.rotation.y = clock.elapsedTime * 0.008;
   });
 
   return (
@@ -631,19 +633,20 @@ function ChamberScene({
     const py = pointer.current.y;
     root.current.rotation.y = THREE.MathUtils.lerp(
       root.current.rotation.y,
-      px * 0.4 + (reduced ? 0 : t * 0.018),
-      0.045,
+      px * 0.32 + (reduced ? 0 : t * 0.01),
+      0.035,
     );
     root.current.rotation.x = THREE.MathUtils.lerp(
       root.current.rotation.x,
-      -py * 0.22,
-      0.045,
+      -py * 0.18,
+      0.035,
     );
     const depthPull = Math.min(2.4, chamber.depth * 0.14);
     const targetZ = diving ? 1.6 : 4.8 - depthPull;
-    camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.055);
-    camera.position.x = THREE.MathUtils.lerp(camera.position.x, px * 0.35, 0.04);
-    camera.position.y = THREE.MathUtils.lerp(camera.position.y, -py * 0.25, 0.04);
+    const camLerp = diving ? 0.1 : 0.04;
+    camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, camLerp);
+    camera.position.x = THREE.MathUtils.lerp(camera.position.x, px * 0.28, 0.035);
+    camera.position.y = THREE.MathUtils.lerp(camera.position.y, -py * 0.2, 0.035);
     camera.lookAt(0, 0, -2.2);
   });
 
@@ -682,7 +685,7 @@ function ChamberScene({
           factor={2.8}
           saturation={0}
           fade
-          speed={diving ? 2.2 : 0.45}
+          speed={diving ? 1.2 : 0.2}
         />
       )}
       {!reduced && (
@@ -690,7 +693,7 @@ function ChamberScene({
           count={48}
           scale={[10, 6, 10]}
           size={2.5}
-          speed={0.35}
+          speed={0.18}
           opacity={0.45}
           color={accent}
         />
@@ -738,8 +741,8 @@ function EmptyField({
   const knot = useRef<THREE.Mesh>(null);
   useFrame(({ clock }) => {
     if (!knot.current || reduced) return;
-    knot.current.rotation.x = clock.elapsedTime * 0.12;
-    knot.current.rotation.y = clock.elapsedTime * 0.18;
+    knot.current.rotation.x = clock.elapsedTime * 0.05;
+    knot.current.rotation.y = clock.elapsedTime * 0.07;
   });
   return (
     <>
@@ -752,7 +755,7 @@ function EmptyField({
         color={tone(palette, 1, "#e8a060")}
       />
       {!reduced && (
-        <Stars radius={55} depth={42} count={1100} factor={2.2} fade speed={0.25} />
+        <Stars radius={55} depth={42} count={700} factor={2} fade speed={0.12} />
       )}
       <NebulaDust
         color={tone(palette, 2, "#7ec8c8")}

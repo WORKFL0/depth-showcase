@@ -29,9 +29,9 @@ export function ChamberHud({
       className="hud"
       aria-live="polite"
       key={chamber.id}
-      initial={reduced ? false : { opacity: 0, y: 24 }}
+      initial={reduced ? false : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: reduced ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: reduced ? 0 : 0.28, ease: [0.22, 1, 0.36, 1] }}
     >
       <header className="hud-top">
         <div>
@@ -80,7 +80,7 @@ export function ChamberHud({
             key={law}
             initial={reduced ? false : { opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: reduced ? 0 : 0.08 + i * 0.05 }}
+            transition={{ delay: reduced ? 0 : 0.04 + i * 0.03, duration: reduced ? 0 : 0.22 }}
           >
             {law}
           </motion.li>
@@ -95,7 +95,7 @@ export function ChamberHud({
             title={ph.detail}
             initial={reduced ? false : { opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: reduced ? 0 : 0.12 + i * 0.04 }}
+            transition={{ delay: reduced ? 0 : 0.06 + i * 0.03, duration: reduced ? 0 : 0.2 }}
           >
             <strong>{ph.kind}</strong> {ph.label}
             <span className="phen-intensity" aria-hidden="true">
@@ -142,7 +142,7 @@ export function ChamberHud({
             whileTap={reduced || diving ? undefined : { scale: 0.98 }}
             initial={reduced ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: reduced ? 0 : 0.15 + i * 0.06 }}
+            transition={{ delay: reduced ? 0 : 0.08 + i * 0.04, duration: reduced ? 0 : 0.22 }}
           >
             <span className="exit-index" aria-hidden="true">
               {i + 1}

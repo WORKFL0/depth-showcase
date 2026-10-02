@@ -73,7 +73,7 @@ export function ConstellationMap({
       initial={reduced ? false : { opacity: 0, y: 24, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 16 }}
-      transition={{ duration: reduced ? 0 : 0.35, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: reduced ? 0 : 0.22, ease: [0.32, 0.72, 0, 1] }}
     >
       <header className="map-head">
         <div>
@@ -147,20 +147,13 @@ export function ConstellationMap({
           if (!p) return null;
           const here = n.id === currentId;
           return (
-            <g key={n.id} transform={`translate(${p.x}, ${p.y})`}>
+            <g
+              key={n.id}
+              className={here ? "map-node-here" : undefined}
+              transform={`translate(${p.x}, ${p.y})`}
+            >
               {here ? (
-                <>
-                  <circle r={22} fill="url(#nodeGlow)" className="map-pulse-ring" />
-                  {!reduced ? (
-                    <circle
-                      r={14}
-                      fill="none"
-                      stroke="#F2F400"
-                      strokeOpacity={0.45}
-                      className="map-pulse-ring"
-                    />
-                  ) : null}
-                </>
+                <circle r={20} fill="url(#nodeGlow)" opacity={0.85} />
               ) : null}
               <circle
                 r={here ? 9 : n.paradox ? 7 : 5.5}

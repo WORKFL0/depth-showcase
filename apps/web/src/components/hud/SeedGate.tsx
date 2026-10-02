@@ -30,9 +30,9 @@ export function SeedGate({
   }
 
   const enter = reduced
-    ? { opacity: 1, y: 0, scale: 1 }
-    : { opacity: 0, y: 28, scale: 0.96 };
-  const shown = { opacity: 1, y: 0, scale: 1 };
+    ? { opacity: 1, y: 0 }
+    : { opacity: 0, y: 8 };
+  const shown = { opacity: 1, y: 0 };
 
   return (
     <motion.section
@@ -40,23 +40,23 @@ export function SeedGate({
       aria-labelledby="gate-title"
       initial={enter}
       animate={shown}
-      transition={{ duration: reduced ? 0 : 0.85, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: reduced ? 0 : 0.28, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="gate-glow" aria-hidden="true" />
       <motion.p
         className="eyebrow"
-        initial={reduced ? false : { opacity: 0, letterSpacing: "0.4em" }}
-        animate={{ opacity: 1, letterSpacing: "0.16em" }}
-        transition={{ delay: reduced ? 0 : 0.15, duration: 0.7 }}
+        initial={reduced ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: reduced ? 0 : 0.06, duration: reduced ? 0 : 0.22 }}
       >
         DEPTH ATELIER · v0.1
       </motion.p>
       <motion.h1
         id="gate-title"
         className="gate-title"
-        initial={reduced ? false : { opacity: 0, y: 16 }}
+        initial={reduced ? false : { opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: reduced ? 0 : 0.28, duration: 0.7 }}
+        transition={{ delay: reduced ? 0 : 0.08, duration: reduced ? 0 : 0.24 }}
       >
         Descend into a seeded world
       </motion.h1>
@@ -64,7 +64,7 @@ export function SeedGate({
         className="gate-lede"
         initial={reduced ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: reduced ? 0 : 0.42, duration: 0.6 }}
+        transition={{ delay: reduced ? 0 : 0.1, duration: reduced ? 0 : 0.22 }}
       >
         One seed. Infinite chambers. Procedural laws, SSE dives, and a living
         constellation — an overnight atelier piece of spatial depth.
@@ -102,9 +102,9 @@ export function SeedGate({
             onClick={() => onEnter(s)}
             initial={reduced ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: reduced ? 0 : 0.5 + i * 0.05 }}
-            whileHover={reduced ? undefined : { y: -2 }}
-            whileTap={reduced ? undefined : { scale: 0.97 }}
+            transition={{ delay: reduced ? 0 : 0.12 + i * 0.03, duration: reduced ? 0 : 0.2 }}
+            whileHover={reduced ? undefined : { y: -1 }}
+            whileTap={reduced ? undefined : { scale: 0.98 }}
           >
             {s}
           </motion.button>
