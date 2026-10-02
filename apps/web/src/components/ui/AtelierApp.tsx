@@ -1,26 +1,16 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CeoDayBrief, HandoffCard as HandoffCardData, Health } from "@depth-showcase/api";
+import type { Health } from "@depth-showcase/api";
 import { LiveRegion } from "@/components/a11y/LiveRegion";
 import { SkipLink } from "@/components/a11y/SkipLink";
 import { ChamberHud } from "@/components/hud/ChamberHud";
 import { ConstellationMap } from "@/components/hud/ConstellationMap";
 import { SeedGate } from "@/components/hud/SeedGate";
-import { CeoDayBriefPanel } from "@/components/craft/CeoDayBriefPanel";
-import { HandoffCard } from "@/components/craft/HandoffCard";
-import { DemoOfferteCard } from "@/components/sales/DemoOfferteCard";
-import { DEMO_OFFERTE } from "@/components/sales/demo-offerte";
-import { DemoAdCopy } from "@/components/seo/DemoAdCopy";
 import { useDepthSession } from "@/hooks/use-depth-session";
-import {
-  getCeoDayBrief,
-  fetchHealth,
-  getShowcaseHandoff,
-} from "@/lib/client-api";
-import handoffSample from "@/content/handoffs/card.sample.json";
-import ceoSample from "@/content/ceo/day-brief-panel.sample.json";
+import { fetchHealth } from "@/lib/client-api";
 
 const DepthField = dynamic(
   () =>
@@ -32,8 +22,6 @@ export function AtelierApp() {
   const session = useDepthSession();
   const pointer = useRef({ x: 0, y: 0 });
   const [health, setHealth] = useState<{ ok: boolean | null; version?: string; storeMode?: string } | null>(null);
-  const [handoff, setHandoff] = useState<HandoffCardData | null>(null);
-  const [dayBrief, setDayBrief] = useState<CeoDayBrief | null>(null);
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
@@ -65,28 +53,6 @@ export function AtelierApp() {
     };
   }, []);
 
-  useEffect(() => {
-    let alive = true;
-    void (async () => {
-      try {
-        const panel = await getShowcaseHandoff();
-        if (alive && panel?.card) setHandoff(panel.card);
-        else if (alive) setHandoff(handoffSample as HandoffCardData);
-      } catch {
-        if (alive) setHandoff(handoffSample as HandoffCardData);
-      }
-      try {
-        const brief = await getCeoDayBrief();
-        if (alive) setDayBrief(brief);
-      } catch {
-        if (alive) setDayBrief(ceoSample as CeoDayBrief);
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, []);
-
   const focusInExits = useCallback(() => {
     const root = document.getElementById("chamber-controls");
     if (!root) return false;
@@ -105,7 +71,6 @@ export function AtelierApp() {
         session.toggleMap();
         return;
       }
-      // Digits / M only when focus is inside #chamber-controls (a11y F2)
       if (!focusInExits()) return;
       if (e.key === "m" || e.key === "M") {
         if (session.chamber) session.toggleMap();
@@ -150,18 +115,25 @@ export function AtelierApp() {
       <>
         <SkipLink href="#seed-input" label="Skip to seed" />
         <main className="shell threshold">
-          <DepthField chamber={null} palette={palette} diving={false} pointer={pointer} />
+          {/* CSS void only — no WebGL on idle gate */}
+          <div className="depth-field depth-field--fallback" aria-hidden="true" />
           <div className="overlay threshold-layout" id="main">
             <div className="threshold-hero">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/brand/stills/still-01-hero-depth.png"
                 alt=""
                 className="threshold-still"
                 width={720}
                 height={900}
+                loading="lazy"
+                decoding="async"
               />
             </div>
             <div className="threshold-main">
+              <p className="atelier-back">
+                <Link href="/">← Terug naar ochtendbrief</Link>
+              </p>
               <SeedGate
                 busy={session.status === "seeding"}
                 error={session.error}
@@ -169,15 +141,7 @@ export function AtelierApp() {
                 onEnter={(s) => void session.seedWorld(s)}
               />
             </div>
-            <aside className="threshold-rail" aria-label="Craft panels">
-              <DemoOfferteCard offerte={DEMO_OFFERTE} />
-              {handoff ? <HandoffCard card={handoff} /> : null}
-              {dayBrief && !dayBrief.meta?.empty ? (
-                <CeoDayBriefPanel brief={dayBrief} />
-              ) : null}
-            </aside>
           </div>
-          <DemoAdCopy />
           <LiveRegion message={live} />
         </main>
       </>

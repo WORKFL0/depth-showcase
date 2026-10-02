@@ -106,6 +106,11 @@ export async function getDemoOfferte(): Promise<DemoOffertePanel> {
   return json(await fetch("/api/showcase/offerte"));
 }
 
+/** @deprecated Prefer getDemoOfferte — returns panel envelope. */
+export async function getShowcaseOfferte(): Promise<DemoOffertePanel> {
+  return getDemoOfferte();
+}
+
 export async function getOsSnapshot(): Promise<OsSnapshot> {
   return json(await fetch("/api/os-snapshot"));
 }

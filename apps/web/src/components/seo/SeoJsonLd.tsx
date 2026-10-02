@@ -6,11 +6,11 @@ const graph = {
     {
       "@type": "WebApplication",
       "@id": `${SITE_URL}/#app`,
-      name: "Depth Atelier",
+      name: "Workflo Ochtendbrief",
       url: SITE_URL,
       description:
-        "Generative infinite-descent atelier: seeded chambers, SSE dives, constellation graph. Built overnight by Workflo OS bots.",
-      applicationCategory: "GameApplication",
+        "CEO cockpit voor Workflo B.V.: ochtendbrief (moet vandaag / vastgelopen / instappen), OS-kaart, sales craft en bot roster.",
+      applicationCategory: "BusinessApplication",
       operatingSystem: "Web",
       offers: {
         "@type": "Offer",
@@ -24,7 +24,7 @@ const graph = {
       "@id": `${SITE_URL}/#org`,
       name: "Workflo",
       url: "https://workflo.it",
-      description: "Workflo builds overnight capability showcases with OS bots.",
+      description: "Workflo — company OS, MSP craft, overnight bot surfaces.",
     },
   ],
 };

@@ -5,23 +5,23 @@ import "../../public/brand/tokens/tokens.css";
 import "./globals.css";
 
 const SITE_URL = "https://depth-showcase.vercel.app";
-const TITLE = "Depth Atelier · Workflo showcase";
+const TITLE = "Workflo · Ochtendbrief";
 const DESCRIPTION =
-  "Seed a world. Descend through procedural chambers. Live dive streams and a constellation map. Workflo overnight showcase.";
+  "CEO cockpit voor Florian: moet vandaag, vastgelopen, instappen. Company OS, sales craft, bots.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: TITLE,
-    template: "%s · Depth Atelier",
+    template: "%s · Workflo",
   },
   description: DESCRIPTION,
   keywords: [
-    "Depth Atelier",
-    "depth engine",
-    "generative chambers",
     "Workflo",
-    "procedural world",
+    "CEO cockpit",
+    "ochtendbrief",
+    "day brief",
+    "company OS",
   ],
   authors: [{ name: "Workflo" }],
   creator: "Workflo",
@@ -31,8 +31,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: SITE_URL,
-    siteName: "Depth Atelier",
-    locale: "en_US",
+    siteName: "Workflo",
+    locale: "nl_NL",
     title: TITLE,
     description: DESCRIPTION,
     images: [
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Depth Atelier: seed a world, then descend",
+        alt: "Workflo ochtendbrief — CEO cockpit",
       },
     ],
   },
@@ -59,7 +59,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="nl">
       <head>
         <link
           rel="preload"
