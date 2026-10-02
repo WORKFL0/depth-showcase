@@ -11,7 +11,7 @@ export default function SalesPage() {
   return (
     <main className="sales-shell">
       <nav className="sales-nav">
-        <Link href="/">← Ochtendbrief</Link>
+        <Link href="/brief">← Ochtendbrief</Link>
         <span>
           <code>DEMO_OFFERTE</code> · hard-atelier
         </span>

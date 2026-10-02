@@ -132,7 +132,7 @@ export function AtelierApp() {
             </div>
             <div className="threshold-main">
               <p className="atelier-back">
-                <Link href="/">← Terug naar ochtendbrief</Link>
+                <Link href="/brief">← Terug naar ochtendbrief</Link>
               </p>
               <SeedGate
                 busy={session.status === "seeding"}

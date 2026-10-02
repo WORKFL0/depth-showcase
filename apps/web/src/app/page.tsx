@@ -1,18 +1,19 @@
-import { CockpitShell } from "@/components/cockpit/CockpitShell";
-import { loadCockpitData } from "@/lib/server-cockpit";
+import type { Metadata } from "next";
+import { MorningDepth } from "@/components/morning/MorningDepth";
+import { depthDisplay, depthMono } from "@/lib/depth-fonts";
 
-export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  title: "De ochtend ligt dieper",
+  description:
+    "Workflo B.V. — de dag begint onder de inbox. Een diepteveld voor de ochtend, daarna de brief.",
+  alternates: { canonical: "/" },
+};
 
-export default async function Home() {
-  const data = await loadCockpitData();
+export default function Home() {
   return (
-    <CockpitShell
-      initialBrief={data.brief}
-      initialHealth={data.health}
-      initialHandoff={data.handoff}
-      initialProjects={data.projects}
-      initialOsHeadline={data.osHeadline}
-      initialOfferte={data.offerte}
+    <MorningDepth
+      displayClass={depthDisplay.className}
+      monoClass={depthMono.className}
     />
   );
 }

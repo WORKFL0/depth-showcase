@@ -135,6 +135,9 @@ export function CockpitShell({
             <span className={`health-chip ${healthClass}`} title="API health">
               {healthLabel}
             </span>
+            <Link className="btn-ghost cockpit-link" href="/">
+              Diepte
+            </Link>
             <Link className="btn-ghost cockpit-link" href="/sales">
               Offerte
             </Link>
