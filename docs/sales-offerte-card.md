@@ -1,26 +1,17 @@
 # Sales craft — demo Halo offerte
 
-Workflo sales surface for Depth Atelier. **Fiction only** — never email, never write to real Halo.
+**Primary mount (Frontend):** secondary panel on seed gate / threshold in `AtelierApp` (idle). Route stays `/`. Optional deep link: `/sales`.
 
-## Surface
+## FE contract (source of truth for the card)
 
 | Piece | Path |
 |-------|------|
-| Page | `/sales` |
-| API | `GET /api/demo/offerte` |
-| Contract | `DemoOfferte` in `@depth-showcase/api` (`packages/api/src/schemas.ts`) |
-| Static mock | `apps/web/src/lib/demo/halo-offerte.ts` |
+| Type + const | `apps/web/src/components/sales/demo-offerte.ts` (`DEMO_OFFERTE`) |
+| JSON twin | `apps/web/src/components/sales/demo-offerte.json` |
 | Card | `apps/web/src/components/sales/DemoOfferteCard.tsx` |
 
-## Contract highlights
+Fiction only — no real emails. Keep DEMO banner / disclaimer visible.
 
-- `demo: true` + hard disclaimer
-- Halo-ish: `status.id = 1` (Nieuw), `billingPeriod` 0 / 2 / 3, optional `haloItemId`
-- Totals split one-off vs monthly (recurring discipline callout)
-- `craft.whisper` / `palette` / `haloFlavors` for Atelier dressing
+## Optional richer Halo API (Quote Helper)
 
-## Frontend notes
-
-- Page currently server-renders the static mock (same payload as the API).
-- Prefer `fetchDemoOfferte()` from `@/lib/client-api` if you want a client fetch + loading state.
-- Safe to restyle the card; keep the DEMO banner and disclaimer visible.
+`GET /api/demo/offerte` + Zod `DemoOfferte` in `@depth-showcase/api` is a parallel Halo-flavored payload (`billingPeriod`, craft palette). Card UI uses the **FE cents contract** above.

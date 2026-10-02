@@ -1,72 +1,59 @@
 "use client";
 
-import type { CSSProperties } from "react";
-import type { DemoOfferte } from "@depth-showcase/api";
+import type { DemoOfferte } from "./demo-offerte";
 
-function eur(n: number) {
+function eurFromCents(cents: number) {
   return new Intl.NumberFormat("nl-NL", {
     style: "currency",
     currency: "EUR",
-  }).format(n);
+  }).format(cents / 100);
 }
 
 type Props = { offerte: DemoOfferte };
 
-/** Halo-flavored sales craft card — demo data only. */
+/** Halo-flavored sales craft card — demo data only. FE owns atelier polish. */
 export function DemoOfferteCard({ offerte }: Props) {
-  const [voidC, amber, signal, mistBlue, hot] = offerte.craft.palette;
+  const vatPct = (offerte.vatRateBps / 100).toFixed(0);
 
   return (
     <article
       className="demo-offerte"
-      style={
-        {
-          "--do-void": voidC,
-          "--do-amber": amber,
-          "--do-signal": signal,
-          "--do-mist": mistBlue,
-          "--do-hot": hot,
-        } as CSSProperties
-      }
-      aria-label={`Demo offerte ${offerte.quoteId}: ${offerte.title}`}
+      aria-label={`Demo offerte ${offerte.id}: ${offerte.title}`}
     >
       <header className="demo-offerte__banner">
         <span className="demo-offerte__pill">DEMO · Halo craft</span>
-        <span className="demo-offerte__status">
-          status {offerte.status.id} · {offerte.status.label}
-        </span>
+        {offerte.haloTicketRef ? (
+          <span className="demo-offerte__status">
+            <code>{offerte.haloTicketRef}</code>
+          </span>
+        ) : null}
       </header>
 
       <div className="demo-offerte__meta">
-        <p className="demo-offerte__whisper">{offerte.craft.whisper}</p>
+        {offerte.toneNote ? (
+          <p className="demo-offerte__whisper">{offerte.toneNote}</p>
+        ) : null}
         <h1 className="demo-offerte__title">{offerte.title}</h1>
-        <p className="demo-offerte__tagline">{offerte.craft.tagline}</p>
         <dl className="demo-offerte__parties">
           <div>
             <dt>Klant</dt>
             <dd>
-              {offerte.client.tradingName}
-              <span className="demo-offerte__muted">
-                {" "}
-                · {offerte.client.city} · fictional
-              </span>
+              {offerte.clientCompany}
+              <span className="demo-offerte__muted"> · fictional</span>
             </dd>
           </div>
           <div>
             <dt>Contact</dt>
-            <dd>
-              {offerte.contact.name}
-              <span className="demo-offerte__muted">
-                {" "}
-                · {offerte.contact.email}
-              </span>
-            </dd>
+            <dd>{offerte.clientName}</dd>
           </div>
           <div>
-            <dt>Quote</dt>
+            <dt>Offerte</dt>
             <dd>
-              #{offerte.quoteId}
-              <span className="demo-offerte__muted"> · never sent</span>
+              <code>{offerte.id}</code>
+              <span className="demo-offerte__muted">
+                {" "}
+                · geldig tot {offerte.validUntil}
+              </span>
             </dd>
           </div>
         </dl>
@@ -76,34 +63,22 @@ export function DemoOfferteCard({ offerte }: Props) {
         <caption className="sr-only">Offerte regels</caption>
         <thead>
           <tr>
-            <th scope="col">Regel</th>
-            <th scope="col">Halo</th>
-            <th scope="col">Facturatie</th>
+            <th scope="col">SKU</th>
+            <th scope="col">Omschrijving</th>
+            <th scope="col">Qty</th>
             <th scope="col">Excl.</th>
           </tr>
         </thead>
         <tbody>
           {offerte.lines.map((line) => (
-            <tr key={line.id}>
+            <tr key={line.sku}>
               <td>
-                <strong>{line.name}</strong>
-                {line.note ? (
-                  <div className="demo-offerte__note">{line.note}</div>
-                ) : null}
+                <code>{line.sku}</code>
               </td>
-              <td>
-                {line.haloItemId != null ? (
-                  <code>item {line.haloItemId}</code>
-                ) : (
-                  "—"
-                )}
-              </td>
-              <td>
-                <code>bp={line.billingPeriod}</code>
-                <div className="demo-offerte__note">{line.billingLabel}</div>
-              </td>
+              <td>{line.description}</td>
+              <td>{line.qty}</td>
               <td className="demo-offerte__price">
-                {eur(line.unitPriceExcl * line.quantity)}
+                {eurFromCents(line.unitPriceCents * line.qty)}
               </td>
             </tr>
           ))}
@@ -112,27 +87,23 @@ export function DemoOfferteCard({ offerte }: Props) {
 
       <footer className="demo-offerte__totals">
         <div>
-          <span>Eenmalig excl.</span>
-          <strong>{eur(offerte.totals.oneOffExcl)}</strong>
+          <span>Subtotaal excl.</span>
+          <strong>{eurFromCents(offerte.subtotalCents)}</strong>
         </div>
         <div>
-          <span>Maandelijks excl.</span>
-          <strong>{eur(offerte.totals.monthlyExcl)}</strong>
+          <span>BTW ({vatPct}%)</span>
+          <strong>
+            {eurFromCents(offerte.totalCents - offerte.subtotalCents)}
+          </strong>
         </div>
         <div>
-          <span>BTW</span>
-          <strong>{Math.round(offerte.totals.vatRate * 100)}%</strong>
+          <span>Totaal incl.</span>
+          <strong>{eurFromCents(offerte.totalCents)}</strong>
         </div>
       </footer>
 
-      <ul className="demo-offerte__flavors">
-        {offerte.craft.haloFlavors.map((f) => (
-          <li key={f}>{f}</li>
-        ))}
-      </ul>
-
       <p className="demo-offerte__disclaimer" role="note">
-        {offerte.disclaimer}
+        DEMO ONLY — fictional client & quote. Not a HaloPSA record. Do not send.
       </p>
     </article>
   );
