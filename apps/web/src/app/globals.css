@@ -569,3 +569,57 @@ a:focus:not(:focus-visible) {
 .skip-link:focus {
   top: 1rem;
 }
+
+
+/* ── Demo SEA (sample ad copy · no spend) ── */
+.demo-sea {
+  position: relative;
+  z-index: 3;
+  margin-top: auto;
+  padding: 0.75rem 1rem 1rem;
+  pointer-events: auto;
+}
+.demo-sea-inner {
+  width: min(640px, calc(100% - 0.5rem));
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
+  border: 2px solid rgba(242, 244, 0, 0.35);
+  background: rgba(10, 10, 10, 0.72);
+  box-shadow: 3px 3px 0 rgba(242, 244, 0, 0.25);
+}
+.demo-sea-badge {
+  display: inline-block;
+  margin-bottom: 0.45rem;
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--signal);
+  background: var(--signal);
+  color: var(--ink);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.demo-sea-headline {
+  margin: 0 0 0.15rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #8ab4f8;
+  line-height: 1.25;
+}
+.demo-sea-url {
+  margin: 0 0 0.25rem;
+  font-size: 0.78rem;
+  font-family: var(--mono);
+  color: #81c995;
+}
+.demo-sea-desc {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: rgba(245, 245, 240, 0.72);
+}
+.shell.threshold {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
