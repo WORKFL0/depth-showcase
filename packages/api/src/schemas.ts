@@ -140,3 +140,56 @@ export const ErrorBodySchema = z.object({
   hint: z.string().optional(),
 });
 export type ErrorBody = z.infer<typeof ErrorBodySchema>;
+
+/** GET /api/demo/offerte — playful Halo-flavored demo (fiction only, never send) */
+export const DemoOfferteLineSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  quantity: z.number(),
+  unitPriceExcl: z.number(),
+  /** Halo-ish: 0 one-off · 2 monthly · 3 yearly */
+  billingPeriod: z.union([z.literal(0), z.literal(2), z.literal(3)]),
+  billingLabel: z.string(),
+  /** Fake Halo item id for craft demos */
+  haloItemId: z.number().optional(),
+  note: z.string().optional(),
+});
+export type DemoOfferteLine = z.infer<typeof DemoOfferteLineSchema>;
+
+export const DemoOfferteSchema = z.object({
+  demo: z.literal(true),
+  disclaimer: z.string(),
+  quoteId: z.number(),
+  status: z.object({
+    id: z.literal(1),
+    label: z.literal("Nieuw"),
+  }),
+  title: z.string(),
+  client: z.object({
+    name: z.string(),
+    tradingName: z.string(),
+    city: z.string(),
+    fictional: z.literal(true),
+  }),
+  contact: z.object({
+    name: z.string(),
+    email: z.string(),
+    fictional: z.literal(true),
+  }),
+  currency: z.literal("EUR"),
+  lines: z.array(DemoOfferteLineSchema),
+  totals: z.object({
+    oneOffExcl: z.number(),
+    monthlyExcl: z.number(),
+    yearlyExcl: z.number(),
+    vatRate: z.number(),
+  }),
+  craft: z.object({
+    tagline: z.string(),
+    whisper: z.string(),
+    palette: z.array(z.string()),
+    haloFlavors: z.array(z.string()),
+  }),
+  createdAt: z.string(),
+});
+export type DemoOfferte = z.infer<typeof DemoOfferteSchema>;
