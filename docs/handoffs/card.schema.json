@@ -1,0 +1,65 @@
+{
+  "$id": "https://workflo.local/depth-showcase/handoff-card.schema.json",
+  "type": "object",
+  "required": [
+    "id",
+    "version",
+    "title",
+    "date",
+    "owner",
+    "status",
+    "summary",
+    "outcomes",
+    "openLoops",
+    "nextSteps"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "version": { "type": "string" },
+    "title": { "type": "string" },
+    "date": { "type": "string" },
+    "owner": { "type": "string" },
+    "status": { "type": "string", "enum": ["draft", "confirmed", "archived"] },
+    "summary": { "type": "string", "maxLength": 280 },
+    "outcomes": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["id", "text"],
+        "properties": {
+          "id": { "type": "string" },
+          "text": { "type": "string" }
+        }
+      }
+    },
+    "openLoops": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["id", "text"],
+        "properties": {
+          "id": { "type": "string" },
+          "text": { "type": "string" },
+          "owner": { "type": "string" }
+        }
+      }
+    },
+    "nextSteps": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["id", "text"],
+        "properties": {
+          "id": { "type": "string" },
+          "text": { "type": "string" },
+          "owner": { "type": "string" }
+        }
+      }
+    },
+    "refs": { "type": "array", "items": { "type": "string" } },
+    "sampleSessionPath": { "type": "string" }
+  }
+}

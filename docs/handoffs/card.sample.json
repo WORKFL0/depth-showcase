@@ -1,0 +1,53 @@
+{
+  "id": "handoff-2026-10-02-depth-atelier",
+  "version": "1.0",
+  "title": "Sessie-log — 2 oktober 2026 (depth-atelier-handoff)",
+  "date": "2026-10-02",
+  "owner": "Handoff Runner",
+  "status": "confirmed",
+  "summary": "Sample handoff for Depth Atelier: card + schema so the site shows how Workflo keeps session context — what shipped, what’s open, no secrets.",
+  "outcomes": [
+    {
+      "id": "o1",
+      "text": "Canonical 05-knowledge/handoffs/_template.md for real session logs"
+    },
+    {
+      "id": "o2",
+      "text": "Showcase card.sample.json + sample-session.md under docs/handoffs"
+    },
+    {
+      "id": "o3",
+      "text": "Mirrored sample for typed FE import at apps/web/src/content/handoffs/"
+    }
+  ],
+  "openLoops": [
+    {
+      "id": "ol1",
+      "text": "Mount HandoffCard in Atelier HUD",
+      "owner": "Frontend Developer"
+    },
+    {
+      "id": "ol2",
+      "text": "Wire GET /api/showcase/handoff from this sample",
+      "owner": "Backend Developer"
+    }
+  ],
+  "nextSteps": [
+    {
+      "id": "n1",
+      "text": "Prefer API for runtime; typed import as FE fallback",
+      "owner": "Frontend Developer"
+    },
+    {
+      "id": "n2",
+      "text": "Zod the API envelope in @depth-showcase/api",
+      "owner": "Backend Developer"
+    }
+  ],
+  "refs": [
+    "05-knowledge/handoffs/_template.md",
+    "02-projects/depth-showcase/docs/handoffs/",
+    "02-projects/depth-showcase/apps/web/src/content/handoffs/card.sample.json"
+  ],
+  "sampleSessionPath": "docs/handoffs/sample-session.md"
+}
