@@ -19,6 +19,13 @@
   outline-offset: 3px;
 }
 
+.building .wf-home__panel :focus-visible,
+.building .hud :focus-visible,
+.building .exit-btn:focus-visible,
+.building .map-panel :focus-visible {
+  outline-color: var(--wf-yellow, #f2f400);
+}
+
 .building-floor,
 .building-nav { position: relative; z-index: 1; }
 
