@@ -5,9 +5,9 @@ import "../../public/brand/tokens/tokens.css";
 import "./globals.css";
 
 const SITE_URL = "https://depth-showcase.vercel.app";
-const TITLE = "Workflo · Ochtendbrief";
+const TITLE = "De zaak, vóór de inbox";
 const DESCRIPTION =
-  "Wij zijn de IT-afdeling van je bedrijf. Ochtendbrief: moet vandaag, vastgelopen, instappen.";
+  "Wij zijn de IT-afdeling van je bedrijf. Eerst wat er vandaag moet, dan de rest.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -18,10 +18,9 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   keywords: [
     "Workflo",
-    "CEO cockpit",
     "ochtendbrief",
-    "day brief",
-    "company OS",
+    "atelier",
+    "sales",
   ],
   authors: [{ name: "Workflo" }],
   creator: "Workflo",
@@ -48,7 +47,7 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Workflo — De zaak, vóór de inbox.",
+        alt: "De zaak, vóór de inbox",
       },
     ],
   },

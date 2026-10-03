@@ -1,22 +1,18 @@
 const SITE_URL = "https://depth-showcase.vercel.app";
 
+const DESCRIPTION =
+  "Wij zijn de IT-afdeling van je bedrijf. Eerst wat er vandaag moet, dan de rest.";
+
 const graph = {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "WebApplication",
-      "@id": `${SITE_URL}/#app`,
-      name: "Workflo Ochtendbrief",
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: "De zaak, vóór de inbox",
+      alternateName: "Workflo",
       url: SITE_URL,
-      description:
-        "CEO cockpit voor Workflo B.V.: ochtendbrief (moet vandaag / vastgelopen / instappen), OS-kaart, sales craft en bot roster.",
-      applicationCategory: "BusinessApplication",
-      operatingSystem: "Web",
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "EUR",
-      },
+      description: DESCRIPTION,
       publisher: { "@id": `${SITE_URL}/#org` },
     },
     {

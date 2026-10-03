@@ -1,68 +1,72 @@
-# SEO / SEA layer — Depth Atelier
+# SEO / SEA layer
 
-## Purpose
-
-Crawlable identity for the overnight showcase: honest meta, structured data, and a **demo** SEA strip so stakeholders can see ad-copy tone without touching Google Ads.
-
-## Live
+One site. Homepage line: **De zaak, vóór de inbox.**
 
 - **URL / canonical:** https://depth-showcase.vercel.app
 - **Repo:** https://github.com/WORKFL0/depth-showcase
 
-## What shipped
+Not a separate product. Not Depth Atelier. Brief, atelier, and sales are routes on the same site.
+
+## Routes
+
+| Path | Index | Rendered title |
+| --- | --- | --- |
+| `/` | index | "De zaak, vóór de inbox" + `%s · Workflo` → "De zaak, vóór de inbox · Workflo" |
+| `/brief` | index | "Ochtendbrief" → "Ochtendbrief · Workflo" |
+| `/atelier` | **noindex** (`robots: { index: false, follow: false }`) | "Atelier · Workflo". Same site, not a product. Not in the sitemap |
+| `/sales` | index | "Sales craft — Demo Halo offerte" → "Sales craft — Demo Halo offerte · Workflo" |
+
+## What is live
 
 | Layer | Status |
 | --- | --- |
-| App Router `metadata` (title template, description, canonical, robots index/follow) | Live in `apps/web/src/app/layout.tsx` |
-| Open Graph + Twitter `summary_large_image` | Live; image `/og.png` |
-| JSON-LD `@graph` (WebApplication + Organization Workflo) | Live via `SeoJsonLd` |
-| `robots.ts` + `sitemap.ts` | Live (homepage only) |
-| Demo SEA strip | Live as footer rail on threshold idle UI — **not** inside SeedGate |
+| App Router metadata (default title, template `%s · Workflo`, description, canonical, robots index/follow) | Live in `apps/web/src/app/layout.tsx` |
+| Open Graph + Twitter `summary_large_image` | Live. Image `/og.png`. Alt: "De zaak, vóór de inbox" |
+| JSON-LD `@graph` (WebSite + Organization Workflo) | Live via `SeoJsonLd` |
+| `robots.ts` + `sitemap.ts` | Live. Sitemap: `/`, `/brief`, `/sales`. Not `/atelier` |
+| Demo SEA strip | Demo only. Badge: "Demo SEA · sample ad copy · no spend". No Google Ads. No spend |
 | This doc | `SEO.md` |
 
 ## Copy bank
 
-### Title / meta
+### Site
 
-- **Default title:** Depth Atelier · Workflo showcase
-- **Template:** `%s · Depth Atelier`
-- **Description (≤155):** Seed a world. Descend through procedural chambers. Live dive streams and a constellation map. Workflo overnight showcase.
-- **OG / Twitter:** same title + description; image `/og.png`
+- **Default title:** De zaak, vóór de inbox
+- **Template:** `%s · Workflo`
+- **Homepage title:** De zaak, vóór de inbox · Workflo
+- **Description:** Wij zijn de IT-afdeling van je bedrijf. Eerst wat er vandaag moet, dan de rest.
+- **Keywords:** Workflo, ochtendbrief, atelier, sales
+- **OG / Twitter title:** De zaak, vóór de inbox
+- **OG / Twitter description:** same as the site description
+- **OG alt:** De zaak, vóór de inbox
 
-### Demo SEA variants (sample only)
+### JSON-LD
 
-1. **Headline:** Depth Atelier: seed a world, then descend  
-   **URL:** depth-showcase.vercel.app  
-   **Desc:** Procedural chambers, live dive streams, constellation map. Workflo overnight showcase — try a seed.
+- **WebSite name:** De zaak, vóór de inbox
+- **alternateName:** Workflo
+- **description:** same as the site description
+- **Organization:** Workflo, https://workflo.it
+- No Offer. No applicationCategory.
 
-2. **Headline:** Seed a world. Watch the constellation grow.  
-   **Desc:** One seed, infinite chambers. SSE dives. Built overnight by Workflo bots.
+### Demo SEA (sample only)
 
-3. **Headline:** Depth Atelier · generative chambers  
-   **Desc:** Name a seed. Descend. Map what you find. No account. No fluff.
+- **Headline:** De zaak, vóór de inbox
+- **URL:** depth-showcase.vercel.app
+- **Desc:** Wij zijn de IT-afdeling van je bedrijf. Voorbeeldadvertentie, geen spend.
+- **Badge:** Demo SEA · sample ad copy · no spend
 
-## Anti-slop rules
+## Anti-slop
 
-- Concrete, spatial, short. Prefer chamber / seed / descend / constellation language.
-- **Avoid:** unlock, revolutionize, seamless, cutting-edge, elevate, empower, next-gen, game-changing.
-- **Titles:** no em-dashes; no “Elevate”.
-- Match brand voice already on the gate: “Descend into a seeded world”, “Seed a world. Descend. Watch the constellation grow.”
+- One site. Do not name Depth Atelier as a product. Do not use "Seed a world", "the morning shaft", or "De ochtend ligt dieper".
+- The Workflo suffix uses a middle dot (`·`), not an em dash.
+- No "Elevate".
+- Avoid unlock, revolutionize, seamless, cutting-edge, elevate, empower, next-gen, game-changing.
 
 ## Demo vs live
 
 | Thing | Live? |
 | --- | --- |
-| Meta / OG / Twitter / JSON-LD / robots / sitemap | Yes — served by the Next app |
-| Demo SEA strip | **Demo only.** Badge: “Demo SEA · sample ad copy · no spend”. Not wired to Google Ads, Search Ads 360, or any bid/spend API. |
-| Search Console / Bing Webmaster | Future |
-| Paid campaigns | Not started; do not treat the strip as a live ad |
-
-## Placement note (Frontend)
-
-Demo SEA sits as a hard-atelier strip **below the threshold fold** (footer rail on AtelierApp idle/seeding state). It must **not** live inside the SeedGate hero. Optional later: link from `/sales` if that route appears — do not invent `/sales` here.
-
-## Future
-
-- Verify property in Google Search Console; submit sitemap.
-- Stronger OG art (photo/illustration) if brand wants more than the flat yellow card.
-- Per-chamber URLs only if chambers become shareable and crawlable (today the app is effectively a single page after seed).
+| Meta / OG / Twitter / JSON-LD / robots / sitemap | Yes. Served by the Next app |
+| Demo SEA strip | **Demo only.** Not wired to Google Ads or any bid or spend API |
+| Search Console | Future |
+| Paid campaigns | Not started. Do not treat the strip as a live ad |
