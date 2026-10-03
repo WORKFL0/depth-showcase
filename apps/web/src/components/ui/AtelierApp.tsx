@@ -117,18 +117,6 @@ export function AtelierApp() {
           {/* CSS void only — no WebGL on idle gate */}
           <div className="depth-field depth-field--fallback" aria-hidden="true" />
           <div className="overlay threshold-layout" id="main">
-            <div className="threshold-hero">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/brand/stills/still-01-hero-depth.png"
-                alt=""
-                className="threshold-still"
-                width={720}
-                height={900}
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
             <div className="threshold-main">
               <SeedGate
                 busy={session.status === "seeding"}
