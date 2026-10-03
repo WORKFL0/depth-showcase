@@ -3,9 +3,9 @@ import { BuildingShell } from "@/components/building/BuildingShell";
 import { MorningDepth } from "@/components/morning/MorningDepth";
 
 export const metadata: Metadata = {
-  title: "Ochtend",
+  title: "De zaak, vóór de inbox",
   description:
-    "Wij zijn de IT-afdeling van je bedrijf. Ochtendbrief, atelier en sales in één Workflo-huis.",
+    "Wij zijn de IT-afdeling van je bedrijf. Eerst wat er vandaag moet, dan de rest.",
   alternates: { canonical: "/" },
 };
 

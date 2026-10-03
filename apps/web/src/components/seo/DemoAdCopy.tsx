@@ -1,8 +1,7 @@
 /**
- * Demo SEA mock — sample search-ad copy only.
+ * Demo SEA mock. Sample search-ad copy only.
  * Not connected to Google Ads. No spend. No Ads API.
- * Mounted as a muted footer rail below the threshold fold (not inside SeedGate).
- * Optional future: link from /sales when that surface exists.
+ * One Workflo site. Not a separate product.
  */
 export function DemoAdCopy() {
   return (
@@ -11,13 +10,11 @@ export function DemoAdCopy() {
         <span className="demo-sea-badge">
           Demo SEA · sample ad copy · no spend
         </span>
-        <p className="demo-sea-headline">
-          Depth Atelier: seed a world, then descend
-        </p>
+        <p className="demo-sea-headline">De zaak, vóór de inbox</p>
         <p className="demo-sea-url">depth-showcase.vercel.app</p>
         <p className="demo-sea-desc">
-          Procedural chambers, live dive streams, constellation map. Workflo
-          overnight showcase — try a seed.
+          Wij zijn de IT-afdeling van je bedrijf. Voorbeeldadvertentie, geen
+          spend.
         </p>
       </div>
     </aside>
