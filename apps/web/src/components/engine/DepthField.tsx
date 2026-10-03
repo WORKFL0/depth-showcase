@@ -2,7 +2,7 @@
 
 /**
  * Depth Field — spatial / generative chamber renderer (Frontend-owned).
- * Consumes frozen Chamber + palette string[]; never invents API shapes.
+ * Consumes frozen Chamber. Palette strings are not painted; colors are Workflo tokens.
  */
 
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -24,10 +24,20 @@ type Props = {
   pointer: MutableRefObject<{ x: number; y: number }>;
 };
 
-function tone(palette: string[] | null, i: number, fallback: string): string {
-  if (!palette?.length) return fallback;
-  return palette[i % palette.length] ?? fallback;
-}
+/**
+ * Workflo paint only. API hue/palette strings are ignored so a seed
+ * cannot bring copper, navy, gold, or cyber into the chamber.
+ * Yellow is the scarce accent (dive + high-risk exits + paradox wire).
+ */
+const WF = {
+  paper: "#F7F7F5",
+  black: "#0A0A0A",
+  ink: "#1A1A1A",
+  graphite: "#2B2B2B",
+  fog: "#6B6B6B",
+  mist: "#D6D6D6",
+  yellow: "#F2F400",
+} as const;
 
 function hash01(label: string, salt: number): number {
   let h = 2166136261 ^ salt;
@@ -46,22 +56,19 @@ function hashPos(label: string, index: number): [number, number, number] {
   return [(a - 0.5) * 4.2, (b - 0.5) * 2.6, (c - 0.5) * 3.2 - 1.2];
 }
 
-function kindColor(
-  kind: PhenomenonKind,
-  palette: string[],
-): string {
+function kindColor(kind: PhenomenonKind): string {
   switch (kind) {
     case "gravity":
     case "fracture":
-      return tone(palette, 4, "#ff4d6d");
+      return WF.black;
     case "silence":
     case "light":
-      return tone(palette, 2, "#8ecae6");
+      return WF.ink;
     case "echo":
-      return tone(palette, 3, "#b8f2e6");
+      return WF.graphite;
     case "memory":
     default:
-      return tone(palette, 1, "#f4a261");
+      return WF.fog;
   }
 }
 
@@ -114,7 +121,7 @@ function ParticleWake({
         opacity={0.65}
         sizeAttenuation
         depthWrite={false}
-        blending={THREE.AdditiveBlending}
+        blending={THREE.NormalBlending}
       />
     </points>
   );
@@ -170,7 +177,7 @@ function GravityWell({
           transparent
           opacity={0.14}
           depthWrite={false}
-          blending={THREE.AdditiveBlending}
+          blending={THREE.NormalBlending}
         />
       </mesh>
     </group>
@@ -206,7 +213,7 @@ function EchoLattice({
             transparent
             opacity={0.22 + (1 - i / rings) * 0.28}
             depthWrite={false}
-            blending={THREE.AdditiveBlending}
+            blending={THREE.NormalBlending}
           />
         </mesh>
       ))}
@@ -299,17 +306,19 @@ function SilenceOrb({
 
 function PhenomenonNode({
   ph,
-  palette,
+  palette: _palette,
   reduced,
   index,
 }: {
   ph: Phenomenon;
+  /** Ignored. Paint comes from WF, not the API palette. */
   palette: string[];
   reduced: boolean;
   index: number;
 }) {
   const position = hashPos(ph.label, index);
-  const color = kindColor(ph.kind, palette);
+  void _palette;
+  const color = kindColor(ph.kind);
 
   if (ph.kind === "fracture") {
     return (
@@ -383,7 +392,7 @@ function DiveTunnel({
             transparent
             opacity={0.15 + (1 - i / rings.length) * 0.45}
             depthWrite={false}
-            blending={THREE.AdditiveBlending}
+            blending={THREE.NormalBlending}
           />
         </mesh>
       ))}
@@ -472,18 +481,18 @@ function ParadoxCore({
               transparent
               opacity={0.2}
               depthWrite={false}
-              blending={THREE.AdditiveBlending}
+              blending={THREE.NormalBlending}
             />
           </mesh>
           <mesh ref={c} position={[0, 0, -2.6]}>
             <icosahedronGeometry args={geoArgs} />
             <meshBasicMaterial
-              color="#F7F7F5"
+              color={WF.mist}
               wireframe
               transparent
               opacity={0.15}
               depthWrite={false}
-              blending={THREE.AdditiveBlending}
+              blending={THREE.NormalBlending}
             />
           </mesh>
         </>
@@ -495,7 +504,7 @@ function ParadoxCore({
           transparent
           opacity={0.06 + chamber.resonance * 0.08}
           depthWrite={false}
-          blending={THREE.AdditiveBlending}
+          blending={THREE.NormalBlending}
         />
       </mesh>
     </Float>
@@ -513,7 +522,8 @@ function ExitBeacons({
   palette: string[];
   reduced: boolean;
 }) {
-  const signal = tone(palette, 2, "#f2f400");
+  void palette;
+  const signal = WF.ink;
   return (
     <group>
       {chamber.exits.map((exit, i) => {
@@ -522,7 +532,7 @@ function ExitBeacons({
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius * 0.55;
         const risk = exit.risk;
-        const col = risk > 0.65 ? tone(palette, 4, "#ff4d6d") : signal;
+        const col = risk > 0.65 ? WF.yellow : signal;
         return (
           <Float
             key={`${exit.label}-${i}`}
@@ -538,7 +548,7 @@ function ExitBeacons({
                 opacity={0.55}
                 side={THREE.DoubleSide}
                 depthWrite={false}
-                blending={THREE.AdditiveBlending}
+                blending={THREE.NormalBlending}
               />
             </mesh>
             <mesh position={[x, y, -1.4]}>
@@ -597,7 +607,7 @@ function NebulaDust({
         opacity={0.35}
         sizeAttenuation
         depthWrite={false}
-        blending={THREE.AdditiveBlending}
+        blending={THREE.NormalBlending}
       />
     </points>
   );
@@ -619,12 +629,13 @@ function ChamberScene({
   reduced: boolean;
 }) {
   const root = useRef<THREE.Group>(null);
-  const voidColor = tone(palette, 0, "#07080f");
-  const fogColor = useMemo(() => new THREE.Color(voidColor), [voidColor]);
-  const ember = tone(palette, 1, "#f2a65a");
-  const signal = tone(palette, 2, "#7ec8e3");
-  const paradox = tone(palette, 4, "#e94560");
-  const accent = tone(palette, 3, "#f2f400");
+  void palette;
+  const voidColor = WF.paper;
+  const fogColor = useMemo(() => new THREE.Color(WF.mist), []);
+  const ember = WF.ink;
+  const signal = WF.graphite;
+  const paradox = WF.black;
+  const accent = WF.yellow;
 
   useFrame(({ camera, clock }) => {
     if (!root.current) return;
@@ -657,23 +668,23 @@ function ChamberScene({
         attach="fog"
         args={[fogColor, 3.2, 14 + chamber.resonance * 10 + (diving ? -4 : 0)]}
       />
-      <ambientLight intensity={0.28} />
+      <ambientLight intensity={0.72} color={WF.paper} />
       <pointLight
         position={[2.4, 3.2, 4]}
-        intensity={1.35 + chamber.resonance * 0.8}
-        color={ember}
+        intensity={1.15 + chamber.resonance * 0.45}
+        color={WF.paper}
         distance={28}
       />
       <pointLight
         position={[-3.2, -1.4, 2.2]}
-        intensity={0.7}
-        color={signal}
+        intensity={0.55}
+        color={WF.mist}
         distance={22}
       />
       <pointLight
         position={[0, 2, -6]}
-        intensity={0.45 + (chamber.paradox ? 0.5 : 0)}
-        color={chamber.paradox ? paradox : accent}
+        intensity={0.35 + (chamber.paradox ? 0.25 : 0)}
+        color={WF.paper}
         distance={18}
       />
 
@@ -715,7 +726,8 @@ function EmptyField({
   palette: string[] | null;
   reduced: boolean;
 }) {
-  const voidColor = tone(palette, 0, "#05060a");
+  void palette;
+  const voidColor = WF.paper;
   const knot = useRef<THREE.Mesh>(null);
   useFrame(({ clock }) => {
     if (!knot.current || reduced) return;
@@ -730,18 +742,18 @@ function EmptyField({
       <pointLight
         position={[2, 2, 4]}
         intensity={1}
-        color={tone(palette, 1, "#e8a060")}
+        color={WF.paper}
       />
       <NebulaDust
-        color={tone(palette, 2, "#7ec8c8")}
+        color={WF.fog}
         reduced={reduced}
         density={0.4}
       />
       <mesh ref={knot}>
         <torusKnotGeometry args={[0.95, 0.2, 160, 24]} />
         <meshStandardMaterial
-          color={tone(palette, 2, "#7ec8c8")}
-          emissive={tone(palette, 1, "#e8a060")}
+          color={WF.ink}
+          emissive={WF.graphite}
           emissiveIntensity={0.35}
           wireframe
           metalness={0.5}
