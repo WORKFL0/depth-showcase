@@ -7,7 +7,7 @@ import "./globals.css";
 const SITE_URL = "https://depth-showcase.vercel.app";
 const TITLE = "Workflo · Ochtendbrief";
 const DESCRIPTION =
-  "CEO cockpit voor Florian: moet vandaag, vastgelopen, instappen. Company OS, sales craft, bots.";
+  "Wij zijn de IT-afdeling van je bedrijf. Ochtendbrief: moet vandaag, vastgelopen, instappen.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -61,8 +61,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0c1218",
-  colorScheme: "dark",
+  themeColor: "#F7F7F5",
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

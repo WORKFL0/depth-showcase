@@ -1,32 +1,27 @@
 import Link from "next/link";
 
 export const FLOORS = [
-  { href: "/", id: "diepte", label: "Diepte" },
+  { href: "/", id: "ochtend", label: "Ochtend" },
   { href: "/brief", id: "brief", label: "Brief" },
-  { href: "/atelier", id: "experiment", label: "Experiment" },
+  { href: "/atelier", id: "atelier", label: "Atelier" },
   { href: "/sales", id: "sales", label: "Sales" },
 ] as const;
 
 export type FloorId = (typeof FLOORS)[number]["id"];
 
-/** Shared pill. The string data-building="een-gebouw" is the live marker. */
-export function BuildingNav({
-  floor,
-  monoClass,
-}: {
-  floor: FloorId;
-  monoClass: string;
-}) {
+export function BuildingNav({ floor }: { floor: FloorId }) {
   return (
-    <nav
-      className={`building-nav ${monoClass}`}
-      aria-label="Verdiepingen"
-      data-building="een-gebouw"
-    >
+    <nav className="building-nav" aria-label="Verdiepingen" data-building="workflo">
       <Link className="building-brand" href="/">
-        Workflo
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/brand/logos/logo-horizontal-black.png"
+          alt="Workflo"
+          width={156}
+          height={34}
+        />
       </Link>
-      <div className="building-pills">
+      <div className="building-links">
         {FLOORS.map((item) => (
           <Link
             key={item.id}

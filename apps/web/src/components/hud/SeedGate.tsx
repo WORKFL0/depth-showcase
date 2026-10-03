@@ -38,7 +38,7 @@ export function SeedGate({
     >
       <div className="gate-brand">
         <img
-          src="/brand/logos/logo-horizontal-on-dark.png"
+          src="/brand/logos/logo-horizontal-black.png"
           alt="Workflo"
           className="gate-logo"
           width={160}
@@ -55,22 +55,21 @@ export function SeedGate({
               : "API…"}
         </span>
       </div>
-      <p className="floor-kicker">Experimentverdieping</p>
+      <p className="floor-kicker">Atelier</p>
       <h1 id="gate-title" className="gate-title">
-        Noem een seed. Daal af.
+        Zet een kamer neer.
       </h1>
       <p className="gate-lede">
-        Zelfde schacht, een verdieping lager. De kamers hier zijn een experiment,
-        geen tweede merk.
+        Zelfde huis als de ochtendbrief. Dit is het experiment, geen tweede product.
       </p>
       <form className="gate-form" onSubmit={submit}>
         <label className="sr-only" htmlFor="seed-input">
-          World seed
+          Startwoord
         </label>
         <input
           id="seed-input"
           className="gate-input"
-          placeholder="name a seed"
+          placeholder="een startwoord"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           maxLength={128}
@@ -78,7 +77,7 @@ export function SeedGate({
           autoComplete="off"
         />
         <button className="btn-primary" type="submit" disabled={busy}>
-          {busy ? "Seeding…" : "Daal af"}
+          {busy ? "Bezig…" : "Start"}
         </button>
       </form>
       <ul className="chip-row">
@@ -101,7 +100,7 @@ export function SeedGate({
         </p>
       ) : null}
       <p className="gate-hint">
-        After entry: focus exits, then <kbd>1</kbd>–<kbd>9</kbd> to dive · <kbd>M</kbd> map
+        Na de start: uitgangen, dan <kbd>1</kbd>–<kbd>9</kbd> · <kbd>M</kbd> kaart
       </p>
     </section>
   );

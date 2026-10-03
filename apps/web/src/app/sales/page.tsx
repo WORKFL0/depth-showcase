@@ -12,10 +12,10 @@ export default function SalesPage() {
   return (
     <BuildingShell floor="sales">
       <main className="floor-sales floor-pad">
-        <p className="floor-kicker">Salesverdieping</p>
-        <h1 className="floor-sales__title">Demo offerte</h1>
+        <p className="floor-kicker">Sales</p>
+        <h1 className="floor-sales__title">Demo-offerte</h1>
         <p className="floor-sales__lede">
-          Fiction-only Halo-flavored quote voor de sales craft. Niet versturen.
+          Halo-flavored quote voor de sales craft. Fiction. Niet versturen.
         </p>
         <DemoOfferteCard offerte={DEMO_OFFERTE} />
       </main>

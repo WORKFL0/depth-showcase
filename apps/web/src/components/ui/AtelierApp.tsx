@@ -91,7 +91,7 @@ export function AtelierApp() {
   }, [session, focusInExits]);
 
   const palette =
-    session.manifest?.palette ?? ["#0c1218", "#c9845a", "#93a4ae", "#e7eef2", "#1a242e"];
+    session.manifest?.palette ?? ["#0A0A0A", "#F2F400", "#6B6B6B", "#F7F7F5", "#2B2B2B"];
   const live =
     session.status === "diving"
       ? "Diving into the next chamber"
@@ -112,7 +112,7 @@ export function AtelierApp() {
   if (idle) {
     return (
       <>
-        <SkipLink href="#seed-input" label="Skip to seed" />
+        <SkipLink href="#seed-input" label="Naar het startwoord" />
         <main className="shell threshold floor-experiment">
           {/* CSS void only — no WebGL on idle gate */}
           <div className="depth-field depth-field--fallback" aria-hidden="true" />
@@ -146,7 +146,7 @@ export function AtelierApp() {
 
   return (
     <>
-      <SkipLink href="#chamber-controls" label="Skip to chamber controls" />
+      <SkipLink href="#chamber-controls" label="Naar de kamer" />
       <main className={`shell floor-experiment ${session.status === "diving" ? "is-diving" : ""}`}>
         <DepthField
           chamber={session.chamber}

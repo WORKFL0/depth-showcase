@@ -1,22 +1,18 @@
 import type { Metadata } from "next";
 import { BuildingShell } from "@/components/building/BuildingShell";
 import { MorningDepth } from "@/components/morning/MorningDepth";
-import { depthDisplay, depthMono } from "@/lib/depth-fonts";
 
 export const metadata: Metadata = {
-  title: "De ochtend ligt dieper",
+  title: "Ochtend",
   description:
-    "Workflo B.V. — de dag begint onder de inbox. Een diepteveld voor de ochtend, daarna de brief.",
+    "Wij zijn de IT-afdeling van je bedrijf. Ochtendbrief, atelier en sales in één Workflo-huis.",
   alternates: { canonical: "/" },
 };
 
 export default function Home() {
   return (
-    <BuildingShell floor="diepte" variant="canvas">
-      <MorningDepth
-        displayClass={depthDisplay.className}
-        monoClass={depthMono.className}
-      />
+    <BuildingShell floor="ochtend">
+      <MorningDepth />
     </BuildingShell>
   );
 }

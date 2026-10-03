@@ -119,8 +119,8 @@ export function CockpitShell({
       <main className="floor-brief floor-pad">
         <header className="floor-brief__intro">
           <div>
-            <p className="floor-kicker">Briefverdieping</p>
-            <p className="floor-brief__hello">De ochtend, gelezen.</p>
+            <p className="floor-kicker">Ochtendbrief</p>
+            <p className="floor-brief__hello">Wat er vandaag moet.</p>
           </div>
           <div className="floor-brief__meta">
             <span>Ochtend · Florian</span>
@@ -150,8 +150,7 @@ export function CockpitShell({
 
         <footer className="floor-brief__foot">
           <p>
-            Workflo B.V. · dezelfde schacht als de voorpagina. Experiment en sales
-            zitten in de navigatie, niet in een tweede huid.
+            Workflo B.V. · Wij zijn de IT-afdeling van je bedrijf.
           </p>
         </footer>
         <LiveRegion message={`Ochtendbrief geladen · ${brief.sections.mustDo.length} moet vandaag`} />

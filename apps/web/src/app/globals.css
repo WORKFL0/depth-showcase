@@ -55,9 +55,9 @@
 html, body {
   margin: 0;
   min-height: 100%;
-  background: var(--void);
-  color: var(--mist);
-  font-family: var(--font);
+  background: var(--wf-paper, #f7f7f5);
+  color: var(--wf-ink, #1a1a1a);
+  font-family: Navigo, var(--font), system-ui, sans-serif;
 }
 button, input { font: inherit; }
 code { font-family: var(--mono); font-size: 0.92em; }
@@ -98,7 +98,7 @@ a:focus:not(:focus-visible) { outline: none; }
 .depth-field--fallback { position: absolute; inset: 0; background: var(--void); }
 .dive-veil {
   position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0;
-  transition: opacity 220ms var(--ease-out);
+  transition: opacity 220ms var(--ease-drawer);
   background: radial-gradient(circle at 50% 55%, transparent 12%, rgba(242, 244, 0, 0.07) 42%, rgba(10, 10, 10, 0.5) 100%);
   mix-blend-mode: screen;
 }
@@ -165,7 +165,7 @@ a:focus:not(:focus-visible) { outline: none; }
   box-shadow: var(--hard);
   border-radius: var(--radius);
 }
-.gate--enter { animation: gate-in 280ms var(--ease-out) both; }
+.gate--enter { animation: gate-in 280ms var(--ease-drawer) both; }
 @keyframes gate-in {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: none; }
@@ -245,7 +245,7 @@ a:focus:not(:focus-visible) { outline: none; }
   cursor: pointer;
   border: 2px solid var(--signal);
   border-radius: var(--radius);
-  transition: transform 140ms var(--ease-out), background 140ms var(--ease-out), box-shadow 140ms var(--ease-out);
+  transition: transform 140ms var(--ease-drawer), background 140ms var(--ease-drawer), box-shadow 140ms var(--ease-drawer);
 }
 .btn-primary {
   display: inline-flex; align-items: center; gap: 0.55rem;
@@ -293,9 +293,9 @@ a:focus:not(:focus-visible) { outline: none; }
   margin-top: auto;
   padding: 1.25rem 1.25rem 1.5rem;
   background: linear-gradient(180deg, transparent, rgba(10, 10, 10, 0.55) 10%, rgba(10, 10, 10, 0.96));
-  transition: opacity 220ms var(--ease-out);
+  transition: opacity 220ms var(--ease-drawer);
 }
-.hud--enter { animation: gate-in 280ms var(--ease-out) both; }
+.hud--enter { animation: gate-in 280ms var(--ease-drawer) both; }
 .shell.is-diving .hud { opacity: 0.72; }
 .hud-top {
   display: flex; justify-content: space-between; gap: 1rem;
@@ -326,7 +326,7 @@ a:focus:not(:focus-visible) { outline: none; }
 }
 .resonance-fill {
   display: block; height: 100%; background: var(--signal);
-  transition: width 400ms var(--ease-out);
+  transition: width 400ms var(--ease-drawer);
 }
 .palette-row { display: flex; gap: 0.3rem; margin-top: 0.55rem; }
 .palette-swatch {
