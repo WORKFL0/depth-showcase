@@ -6,12 +6,12 @@
  */
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float } from "@react-three/drei";
 import {
   Suspense,
   useMemo,
   useRef,
   type MutableRefObject,
+  type ReactNode,
 } from "react";
 import * as THREE from "three";
 import type { Chamber, Phenomenon, PhenomenonKind } from "@depth-showcase/api";
@@ -103,10 +103,8 @@ function ParticleWake({
   useFrame(({ clock }) => {
     if (!ref.current || reduced) return;
     const t = clock.elapsedTime;
-    ref.current.rotation.y = t * 0.08 * (0.4 + ph.intensity);
-    ref.current.rotation.x = Math.sin(t * 0.12) * 0.12;
-    const mat = ref.current.material as THREE.PointsMaterial;
-    mat.opacity = 0.45 + Math.sin(t * 0.55 + ph.intensity) * 0.1 + ph.intensity * 0.2;
+    ref.current.rotation.y = Math.sin(t * 0.2) * 0.08;
+    ref.current.rotation.x = Math.sin(t * 0.32) * 0.06;
   });
 
   return (
@@ -144,16 +142,12 @@ function GravityWell({
     if (reduced) return;
     const t = clock.elapsedTime;
     if (ref.current) {
-      const s = 0.92 + Math.sin(t * (0.45 + ph.intensity * 0.25)) * 0.06;
-      ref.current.scale.setScalar(s);
-      ref.current.rotation.y = t * 0.12;
-      ref.current.rotation.x = t * 0.05;
+      ref.current.rotation.y = Math.sin(t * 0.2) * 0.12;
+      ref.current.rotation.x = Math.sin(t * 0.32) * 0.08;
     }
     if (halo.current) {
-      const s = 1.08 + Math.sin(t * 0.7) * 0.04;
-      halo.current.scale.setScalar(s);
-      (halo.current.material as THREE.MeshBasicMaterial).opacity =
-        0.12 + Math.sin(t * 0.9) * 0.03;
+      halo.current.rotation.y = Math.sin(t * 0.32) * 0.1;
+      halo.current.rotation.z = Math.sin(t * 0.2) * 0.06;
     }
   });
   const r = 0.42 + ph.intensity * 0.4;
@@ -199,8 +193,8 @@ function EchoLattice({
   useFrame(({ clock }) => {
     if (!group.current || reduced) return;
     const t = clock.elapsedTime;
-    group.current.rotation.z = t * 0.045;
-    group.current.rotation.y = t * 0.07;
+    group.current.rotation.z = Math.sin(t * 0.2) * 0.08;
+    group.current.rotation.y = Math.sin(t * 0.32) * 0.1;
   });
   const rings = reduced ? 3 : 6;
   return (
@@ -236,9 +230,10 @@ function FractureShard({
   useFrame(({ clock }) => {
     if (!group.current || reduced) return;
     const t = clock.elapsedTime;
-    group.current.rotation.x = t * 0.55;
-    group.current.rotation.z = Math.sin(t * 2.1) * 0.4;
-    group.current.position.x = position[0] + Math.sin(t * 3.2) * 0.04 * ph.intensity;
+    group.current.rotation.x = Math.sin(t * 0.2) * 0.12;
+    group.current.rotation.z = Math.sin(t * 0.32) * 0.1;
+    group.current.position.x = position[0] + Math.sin(t * 0.2) * 0.03;
+    group.current.position.y = position[1] + Math.sin(t * 0.32) * 0.02;
   });
   return (
     <group ref={group} position={position}>
@@ -282,10 +277,8 @@ function SilenceOrb({
   useFrame(({ clock }) => {
     if (!ref.current || reduced) return;
     const t = clock.elapsedTime;
-    const s = 0.96 + Math.sin(t * 0.4) * 0.04;
-    ref.current.scale.setScalar(s);
-    (ref.current.material as THREE.MeshStandardMaterial).opacity =
-      0.18 + Math.sin(t * 0.5) * 0.04 + ph.intensity * 0.18;
+    ref.current.rotation.y = Math.sin(t * 0.2) * 0.08;
+    ref.current.rotation.x = Math.sin(t * 0.32) * 0.05;
   });
   return (
     <mesh ref={ref} position={position}>
@@ -367,8 +360,8 @@ function DiveTunnel({
   );
 
   useFrame((_, dt) => {
-    if (!group.current) return;
-    if (diving && !reduced) {
+    if (!group.current || reduced) return;
+    if (diving) {
       group.current.position.z += dt * 14;
       if (group.current.position.z > 8) group.current.position.z = 0;
       group.current.visible = true;
@@ -400,7 +393,7 @@ function DiveTunnel({
   );
 }
 
-/* ─── Paradox glitch twin ───────────────────────────────────── */
+/* ─── Paradox twin, same slow drift ─────────────────────────── */
 
 function ParadoxCore({
   chamber,
@@ -415,33 +408,31 @@ function ParadoxCore({
   ember: string;
   reduced: boolean;
 }) {
-  const a = useRef<THREE.Mesh>(null);
+  const drift = useRef<THREE.Group>(null);
   const b = useRef<THREE.Mesh>(null);
   const c = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
-    const t = clock.elapsedTime;
-    const pulse = reduced
-      ? 1
-      : 1 + Math.sin(t * (0.55 + chamber.resonance * 0.35)) * 0.035 * Math.max(0.35, chamber.resonance);
-    if (a.current) {
-      a.current.scale.setScalar(pulse);
-      a.current.rotation.y = reduced ? 0 : t * 0.08;
-      a.current.rotation.x = reduced ? 0 : Math.sin(t * 0.18) * 0.08;
+    if (!drift.current) return;
+    if (reduced) {
+      drift.current.position.y = 0;
+      drift.current.rotation.set(0, 0, 0);
+      return;
     }
-    if (chamber.paradox && !reduced) {
-      const glitch = Math.sin(t * 17.3) > 0.82 ? 0.12 : 0.03;
+    const t = clock.elapsedTime;
+    drift.current.position.y = Math.sin(t * 0.2) * 0.06;
+    drift.current.rotation.y = Math.sin(t * 0.2) * 0.05;
+    drift.current.rotation.x = Math.sin(t * 0.32) * 0.04;
+    if (chamber.paradox) {
+      const ox = Math.sin(t * 0.2) * 0.04;
+      const oy = Math.sin(t * 0.32) * 0.03;
       if (b.current) {
-        b.current.position.x = glitch;
-        b.current.position.y = -glitch * 0.5;
-        (b.current.material as THREE.MeshBasicMaterial).opacity =
-          0.18 + (Math.sin(t * 23) > 0.9 ? 0.25 : 0);
+        b.current.position.x = ox;
+        b.current.position.y = -oy;
       }
       if (c.current) {
-        c.current.position.x = -glitch * 1.2;
-        c.current.position.y = glitch * 0.7;
-        (c.current.material as THREE.MeshBasicMaterial).opacity =
-          0.12 + (Math.sin(t * 19 + 1) > 0.88 ? 0.3 : 0);
+        c.current.position.x = -ox;
+        c.current.position.y = oy;
       }
     }
   });
@@ -453,12 +444,8 @@ function ParadoxCore({
   const mainColor = chamber.paradox ? paradox : signal;
 
   return (
-    <Float
-      speed={reduced ? 0 : 0.55}
-      rotationIntensity={reduced ? 0 : 0.18}
-      floatIntensity={reduced ? 0 : 0.22}
-    >
-      <mesh ref={a} position={[0, 0, -2.6]}>
+    <group ref={drift}>
+      <mesh position={[0, 0, -2.6]}>
         <icosahedronGeometry args={geoArgs} />
         <meshStandardMaterial
           color={mainColor}
@@ -507,8 +494,34 @@ function ParadoxCore({
           blending={THREE.NormalBlending}
         />
       </mesh>
-    </Float>
+    </group>
   );
+}
+
+/* ─── One drift ─────────────────────────────────────────────── */
+
+function SlowDrift({
+  reduced,
+  phase,
+  children,
+}: {
+  reduced: boolean;
+  phase: number;
+  children: ReactNode;
+}) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    if (reduced) {
+      ref.current.position.y = 0;
+      ref.current.rotation.y = 0;
+      return;
+    }
+    const t = clock.elapsedTime;
+    ref.current.position.y = Math.sin(t * 0.2 + phase) * 0.06;
+    ref.current.rotation.y = Math.sin(t * 0.32 + phase) * 0.05;
+  });
+  return <group ref={ref}>{children}</group>;
 }
 
 /* ─── Exit beacons ──────────────────────────────────────────── */
@@ -534,12 +547,7 @@ function ExitBeacons({
         const risk = exit.risk;
         const col = risk > 0.65 ? WF.yellow : signal;
         return (
-          <Float
-            key={`${exit.label}-${i}`}
-            speed={reduced ? 0 : 0.35 + risk * 0.25}
-            floatIntensity={reduced ? 0 : 0.12}
-            rotationIntensity={0}
-          >
+          <SlowDrift key={`${exit.label}-${i}`} reduced={reduced} phase={i}>
             <mesh position={[x, y, -1.4]}>
               <ringGeometry args={[0.18, 0.28, 32]} />
               <meshBasicMaterial
@@ -560,7 +568,7 @@ function ExitBeacons({
                 depthWrite={false}
               />
             </mesh>
-          </Float>
+          </SlowDrift>
         );
       })}
     </group>
@@ -592,7 +600,9 @@ function NebulaDust({
 
   useFrame(({ clock }) => {
     if (!ref.current || reduced) return;
-    ref.current.rotation.y = clock.elapsedTime * 0.008;
+    const t = clock.elapsedTime;
+    ref.current.rotation.y = Math.sin(t * 0.2) * 0.04;
+    ref.current.rotation.x = Math.sin(t * 0.32) * 0.02;
   });
 
   return (
@@ -639,21 +649,28 @@ function ChamberScene({
 
   useFrame(({ camera, clock }) => {
     if (!root.current) return;
-    const t = reduced ? 0 : clock.elapsedTime;
+    const depthPull = Math.min(2.4, chamber.depth * 0.14);
+    const targetZ = diving ? 1.6 : 4.8 - depthPull;
+    if (reduced) {
+      root.current.rotation.x = 0;
+      root.current.rotation.y = 0;
+      camera.position.set(0, 0, targetZ);
+      camera.lookAt(0, 0, -2.2);
+      return;
+    }
+    const t = clock.elapsedTime;
     const px = pointer.current.x;
     const py = pointer.current.y;
     root.current.rotation.y = THREE.MathUtils.lerp(
       root.current.rotation.y,
-      px * 0.32 + (reduced ? 0 : t * 0.01),
+      px * 0.32 + Math.sin(t * 0.2) * 0.04,
       0.035,
     );
     root.current.rotation.x = THREE.MathUtils.lerp(
       root.current.rotation.x,
-      -py * 0.18,
+      -py * 0.18 + Math.sin(t * 0.32) * 0.03,
       0.035,
     );
-    const depthPull = Math.min(2.4, chamber.depth * 0.14);
-    const targetZ = diving ? 1.6 : 4.8 - depthPull;
     const camLerp = diving ? 0.1 : 0.04;
     camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, camLerp);
     camera.position.x = THREE.MathUtils.lerp(camera.position.x, px * 0.28, 0.035);
@@ -731,8 +748,9 @@ function EmptyField({
   const knot = useRef<THREE.Mesh>(null);
   useFrame(({ clock }) => {
     if (!knot.current || reduced) return;
-    knot.current.rotation.x = clock.elapsedTime * 0.05;
-    knot.current.rotation.y = clock.elapsedTime * 0.07;
+    const t = clock.elapsedTime;
+    knot.current.rotation.x = Math.sin(t * 0.2) * 0.08;
+    knot.current.rotation.y = Math.sin(t * 0.32) * 0.1;
   });
   return (
     <>
@@ -770,6 +788,7 @@ export function DepthField({ chamber, palette, diving, pointer }: Props) {
   return (
     <div className="absolute inset-0 depth-field" aria-hidden="true" role="presentation">
       <Canvas
+        frameloop={reduced ? "demand" : "always"}
         dpr={reduced ? 1 : (typeof window !== "undefined" && window.innerWidth < 768 ? 1 : [1, 1.5])}
         gl={{
           antialias: !reduced,
